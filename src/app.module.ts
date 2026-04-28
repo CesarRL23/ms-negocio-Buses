@@ -19,6 +19,7 @@ import { AddressModule } from './address/address.module';
 import { PaymentMethodModule } from './payment_method/payment_method.module';
 import { CitizenPaymentMethodModule } from './citizen_payment_method/citizen_payment_method.module';
 import { SecurityGuard } from './guards/security.guard';
+import { CompanyDriverModule } from './company_driver/company_driver.module';
 
 @Module({
   imports: [
@@ -72,6 +73,8 @@ import { SecurityGuard } from './guards/security.guard';
     PaymentMethodModule,
 
     CitizenPaymentMethodModule,
+
+    CompanyDriverModule,
 
     
   ],

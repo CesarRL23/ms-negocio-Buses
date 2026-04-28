@@ -1,6 +1,6 @@
-import { Address } from "src/address/entities/address.entity";
-import { Person } from "src/person/entities/person.entity";
-import { CitizenPaymentMethod } from "src/citizen_payment_method/entities/citizen_payment_method.entity";
+import { Address } from "../../address/entities/address.entity";
+import { Person } from "../../person/entities/person.entity";
+import { CitizenPaymentMethod } from "../../citizen_payment_method/entities/citizen_payment_method.entity";
 import { Entity, JoinColumn, OneToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('citizen')
