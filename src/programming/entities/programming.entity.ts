@@ -1,20 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany } from "typeorm";
 import { Route } from "../../route/entities/route.entity";
 import { Bus } from "../../bus/entities/bus.entity";
+import { Ticket } from "../../ticket/entities/ticket.entity";
 
 @Entity('programming')
 export class Programming {
 
     @PrimaryGeneratedColumn()
     id?: number;
-
-    @ManyToOne(() => Route, route => route.programming)
-    @JoinColumn({ name: 'route_id' })
-    route?: Route;
-
-    @ManyToOne(() => Bus, bus => bus.programming)
-    @JoinColumn({ name: 'bus_id' })
-    bus?: Bus;
 
     @Column()
     fechaInicio?: Date;
@@ -31,4 +24,14 @@ export class Programming {
     @Column({ default: true })
     activo?: boolean;
 
+    @ManyToOne(() => Route, route => route.programming)
+    route?: Route;
+
+    @ManyToOne(() => Bus, bus => bus.programming)
+    bus?: Bus;
+
+    @OneToMany(() => Ticket, ticket => ticket.programming)
+    tickets?: Ticket[];
+
 }
+

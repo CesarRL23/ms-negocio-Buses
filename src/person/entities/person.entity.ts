@@ -16,5 +16,7 @@ export class Person {
     @Column()
     password?: string;
 
+    @Column({ nullable: true })
+    userId?: number;
     
 }

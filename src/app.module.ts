@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PersonModule } from './person/person.module';
@@ -13,6 +14,11 @@ import { WhereaboutsModule } from './whereabouts/whereabouts.module';
 import { NodoModule } from './nodo/nodo.module';
 import { ProgrammingModule } from './programming/programming.module';
 import { TicketModule } from './ticket/ticket.module';
+import { RecordModule } from './record/record.module';
+import { AddressModule } from './address/address.module';
+import { PaymentMethodModule } from './payment_method/payment_method.module';
+import { CitizenPaymentMethodModule } from './citizen_payment_method/citizen_payment_method.module';
+import { SecurityGuard } from './guards/security.guard';
 
 @Module({
   imports: [
@@ -59,7 +65,21 @@ import { TicketModule } from './ticket/ticket.module';
 
     TicketModule,
 
+    RecordModule,
+
+    AddressModule,
+
+    PaymentMethodModule,
+
+    CitizenPaymentMethodModule,
+
     
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: SecurityGuard,
+    },
   ],
 })
 export class AppModule {}
