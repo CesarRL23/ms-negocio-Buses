@@ -14,7 +14,11 @@ export class RouteService {
 
   async create(createRouteDto: CreateRouteDto): Promise<Route> {
     try {
-      const route = this.routeRepository.create(createRouteDto);
+      const { companyId, ...routeData } = createRouteDto;
+      const route = this.routeRepository.create(routeData);
+      if (companyId) {
+        route.company = { id: companyId } as any;
+      }
       return await this.routeRepository.save(route);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Error desconocido';
@@ -22,16 +26,48 @@ export class RouteService {
     }
   }
 
-  async findAll(): Promise<Route[]> {
-    return await this.routeRepository.find();
+  async findAll(companyId?: number): Promise<Route[]> {
+    const where = companyId ? { company: { id: companyId } } : {};
+    return await this.routeRepository.find({
+      where,
+      relations: ['nodos', 'nodos.stop', 'company'],
+      order: { id: 'ASC' },
+    });
   }
 
   async findOne(id: number): Promise<Route> {
-    const route = await this.routeRepository.findOne({ where: { id } });
+    const route = await this.routeRepository.findOne({
+      where: { id },
+      relations: ['nodos', 'nodos.stop'],
+    });
     if (!route) {
       throw new NotFoundException(`Ruta con ID ${id} no encontrada`);
     }
     return route;
+  }
+
+  async findNodosByRoute(routeId: number): Promise<any> {
+    const route = await this.routeRepository.findOne({
+      where: { id: routeId },
+      relations: ['nodos', 'nodos.stop'],
+    });
+    if (!route) {
+      throw new NotFoundException(`Ruta con ID ${routeId} no encontrada`);
+    }
+    const nodosSorted = (route.nodos || []).sort((a, b) => (a.orden || 0) - (b.orden || 0));
+    return {
+      route: {
+        id: route.id,
+        nombre: route.nombre,
+        descripcion: route.descripcion,
+        origen: route.origen,
+        destino: route.destino,
+        distancia: route.distancia,
+        duracion_estimada: route.duracion_estimada,
+        tarifa: route.tarifa,
+      },
+      nodos: nodosSorted,
+    };
   }
 
   async update(id: number, updateRouteDto: UpdateRouteDto): Promise<Route> {

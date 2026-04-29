@@ -20,4 +20,7 @@ export class CreateBusDto {
   @IsNotEmpty()
   @IsString()
   estado?: string;
+
+  @IsNumber()
+  companyId?: number;
 }

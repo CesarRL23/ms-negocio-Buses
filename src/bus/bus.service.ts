@@ -13,12 +13,22 @@ export class BusService {
   ) {}
 
   async create(createBusDto: CreateBusDto): Promise<Bus> {
-    const bus = this.busRepository.create(createBusDto);
+    const { companyId, ...busData } = createBusDto;
+    const bus = this.busRepository.create(busData);
+    if (companyId) {
+      bus.company = { id: companyId } as any;
+    }
     return await this.busRepository.save(bus);
   }
 
-  async findAll(): Promise<Bus[]> {
-    return await this.busRepository.find();
+  async findAll(companyId?: number): Promise<Bus[]> {
+    if (companyId) {
+      return await this.busRepository.find({
+        where: { company: { id: companyId } },
+        relations: ['company']
+      });
+    }
+    return await this.busRepository.find({ relations: ['company'] });
   }
 
   async findOne(id: number): Promise<Bus> {
