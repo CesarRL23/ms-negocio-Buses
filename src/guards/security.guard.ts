@@ -7,14 +7,16 @@ export class SecurityGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const { headers, url, method } = request;
+    const { headers, method } = request;
 
     if (!headers.authorization) {
       throw new UnauthorizedException('Token de autorización faltante');
     }
 
     const token = headers.authorization.replace('Bearer ', '');
-    const permissionData = { url, method };
+    const rawUrl = request.originalUrl || request.url || '';
+    const cleanUrl = rawUrl.split('?')[0];
+    const permissionData = { url: cleanUrl, method };
 
     try {
       const securityUrl = `${process.env.MS_SECURITY}/api/public/security/permissions-validation`;

@@ -20,6 +20,10 @@ import { PaymentMethodModule } from './payment_method/payment_method.module';
 import { CitizenPaymentMethodModule } from './citizen_payment_method/citizen_payment_method.module';
 import { SecurityGuard } from './guards/security.guard';
 import { CompanyDriverModule } from './company_driver/company_driver.module';
+import { MessageModule } from './message/message.module';
+import { RecipientPersonModule } from './recipient-person/recipient-person.module';
+import { GroupModule } from './group/group.module';
+import { PersonGroupModule } from './person-group/person-group.module';
 
 @Module({
   imports: [
@@ -75,6 +79,14 @@ import { CompanyDriverModule } from './company_driver/company_driver.module';
     CitizenPaymentMethodModule,
 
     CompanyDriverModule,
+
+    MessageModule,
+
+    RecipientPersonModule,
+
+    GroupModule,
+
+    PersonGroupModule,
 
     
   ],
