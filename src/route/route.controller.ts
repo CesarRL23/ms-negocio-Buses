@@ -12,9 +12,9 @@ import { RouteService } from './route.service';
 import { CreateRouteDto } from './dto/create-route.dto';
 import { UpdateRouteDto } from './dto/update-route.dto';
 
-@Controller('route')
-export class RouteController {
-  constructor(private readonly routeService: RouteService) {}
+    @Controller('route')
+    export class RouteController {
+      constructor(private readonly routeService: RouteService) {}
 
   @Post()
   create(@Body() createRouteDto: CreateRouteDto) {

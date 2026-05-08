@@ -23,6 +23,10 @@ import { CompanyDriverModule } from './company_driver/company_driver.module';
 import { IncidenteModule } from './incidente/incidente.module';
 import { IncidenteBusModule } from './incidente_bus/incidente_bus.module';
 import { FotoModule } from './foto/foto.module';
+import { MessageModule } from './message/message.module';
+import { RecipientPersonModule } from './recipient-person/recipient-person.module';
+import { GroupModule } from './group/group.module';
+import { PersonGroupModule } from './person-group/person-group.module';
 
 @Module({
   imports: [
@@ -81,6 +85,10 @@ import { FotoModule } from './foto/foto.module';
     IncidenteModule,
     IncidenteBusModule,
     FotoModule,
+    MessageModule,
+    RecipientPersonModule,
+    GroupModule,
+    PersonGroupModule,
   ],
   providers: [
     {
