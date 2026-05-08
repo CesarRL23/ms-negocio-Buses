@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Whereabouts } from './entities/whereabout.entity';
@@ -17,8 +21,11 @@ export class WhereaboutsService {
       const whereabout = this.whereaboutsRepository.create(createWhereaboutDto);
       return await this.whereaboutsRepository.save(whereabout);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al crear el punto de referencia: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al crear el punto de referencia: ' + errorMessage,
+      );
     }
   }
 
@@ -27,16 +34,23 @@ export class WhereaboutsService {
   }
 
   async findOne(id: number): Promise<Whereabouts> {
-    const whereabout = await this.whereaboutsRepository.findOne({ where: { id } });
+    const whereabout = await this.whereaboutsRepository.findOne({
+      where: { id },
+    });
 
     if (!whereabout) {
-      throw new NotFoundException(`Punto de referencia con ID ${id} no encontrado`);
+      throw new NotFoundException(
+        `Punto de referencia con ID ${id} no encontrado`,
+      );
     }
 
     return whereabout;
   }
 
-  async update(id: number, updateWhereaboutDto: UpdateWhereaboutDto): Promise<Whereabouts> {
+  async update(
+    id: number,
+    updateWhereaboutDto: UpdateWhereaboutDto,
+  ): Promise<Whereabouts> {
     const whereabout = await this.findOne(id);
 
     Object.assign(whereabout, updateWhereaboutDto);
@@ -44,8 +58,11 @@ export class WhereaboutsService {
     try {
       return await this.whereaboutsRepository.save(whereabout);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al actualizar el punto de referencia: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al actualizar el punto de referencia: ' + errorMessage,
+      );
     }
   }
 
@@ -54,10 +71,15 @@ export class WhereaboutsService {
 
     try {
       await this.whereaboutsRepository.remove(whereabout);
-      return { message: `Punto de referencia con ID ${id} eliminado correctamente` };
+      return {
+        message: `Punto de referencia con ID ${id} eliminado correctamente`,
+      };
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al eliminar el punto de referencia: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al eliminar el punto de referencia: ' + errorMessage,
+      );
     }
   }
 }

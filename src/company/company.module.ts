@@ -6,7 +6,7 @@ import { Company } from './entities/company.entity';
 import { Driver } from '../driver/entities/driver.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Company, Driver])], 
+  imports: [TypeOrmModule.forFeature([Company, Driver])],
   controllers: [CompanyController],
   providers: [CompanyService],
 })

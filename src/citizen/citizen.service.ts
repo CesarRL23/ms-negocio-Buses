@@ -34,7 +34,10 @@ export class CitizenService {
     return citizen;
   }
 
-  async update(id: number, updateCitizenDto: UpdateCitizenDto): Promise<Citizen> {
+  async update(
+    id: number,
+    updateCitizenDto: UpdateCitizenDto,
+  ): Promise<Citizen> {
     await this.findOne(id);
     if (updateCitizenDto.personId) {
       await this.citizenRepository.update(id, {

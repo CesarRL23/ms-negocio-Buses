@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRouteDto } from './dto/create-route.dto';
@@ -21,7 +25,8 @@ export class RouteService {
       }
       return await this.routeRepository.save(route);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
+      const message =
+        error instanceof Error ? error.message : 'Error desconocido';
       throw new BadRequestException('Error al crear la ruta: ' + message);
     }
   }
@@ -54,7 +59,9 @@ export class RouteService {
     if (!route) {
       throw new NotFoundException(`Ruta con ID ${routeId} no encontrada`);
     }
-    const nodosSorted = (route.nodos || []).sort((a, b) => (a.orden || 0) - (b.orden || 0));
+    const nodosSorted = (route.nodos || []).sort(
+      (a, b) => (a.orden || 0) - (b.orden || 0),
+    );
     return {
       route: {
         id: route.id,
@@ -76,7 +83,8 @@ export class RouteService {
     try {
       return await this.routeRepository.save(route);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
+      const message =
+        error instanceof Error ? error.message : 'Error desconocido';
       throw new BadRequestException('Error al actualizar la ruta: ' + message);
     }
   }

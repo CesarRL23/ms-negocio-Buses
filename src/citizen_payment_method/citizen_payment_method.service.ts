@@ -26,19 +26,28 @@ export class CitizenPaymentMethodService {
   }
 
   async findOne(id: number) {
-    const citizenPaymentMethod = await this.citizenPaymentMethodRepository.findOne({
-      where: { id },
-      relations: ['citizen', 'paymentMethod', 'tickets'],
-    });
+    const citizenPaymentMethod =
+      await this.citizenPaymentMethodRepository.findOne({
+        where: { id },
+        relations: ['citizen', 'paymentMethod', 'tickets'],
+      });
     if (!citizenPaymentMethod) {
-      throw new NotFoundException(`CitizenPaymentMethod con id ${id} no encontrado`);
+      throw new NotFoundException(
+        `CitizenPaymentMethod con id ${id} no encontrado`,
+      );
     }
     return citizenPaymentMethod;
   }
 
-  async update(id: number, updateCitizenPaymentMethodDto: UpdateCitizenPaymentMethodDto) {
+  async update(
+    id: number,
+    updateCitizenPaymentMethodDto: UpdateCitizenPaymentMethodDto,
+  ) {
     await this.findOne(id);
-    await this.citizenPaymentMethodRepository.update(id, updateCitizenPaymentMethodDto);
+    await this.citizenPaymentMethodRepository.update(
+      id,
+      updateCitizenPaymentMethodDto,
+    );
     return await this.findOne(id);
   }
 

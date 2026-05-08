@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import axios from 'axios';
 
 @Injectable()
@@ -24,7 +30,7 @@ export class SecurityGuard implements CanActivate {
 
       if (response.data === true) return true;
       else throw new UnauthorizedException('Permisos insuficientes');
-    } catch(error: any) {
+    } catch (error: any) {
       this.logger.error(`Error al validar permisos: ${error.message}`);
       throw new UnauthorizedException('Error al validar permisos');
     }

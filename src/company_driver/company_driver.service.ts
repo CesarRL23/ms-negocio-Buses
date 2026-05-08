@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CompanyDriver } from './entities/company_driver.entity';
@@ -18,17 +22,23 @@ export class CompanyDriverService {
     private readonly driverRepository: Repository<Driver>,
   ) {}
 
-  async create(createCompanyDriverDto: CreateCompanyDriverDto): Promise<CompanyDriver> {
+  async create(
+    createCompanyDriverDto: CreateCompanyDriverDto,
+  ): Promise<CompanyDriver> {
     const { companyId, driverId } = createCompanyDriverDto;
 
     // Validar que la compañía existe
-    const company = await this.companyRepository.findOne({ where: { id: companyId } });
+    const company = await this.companyRepository.findOne({
+      where: { id: companyId },
+    });
     if (!company) {
       throw new NotFoundException(`Company with ID ${companyId} not found`);
     }
 
     // Validar que el conductor existe
-    const driver = await this.driverRepository.findOne({ where: { id: driverId } });
+    const driver = await this.driverRepository.findOne({
+      where: { id: driverId },
+    });
     if (!driver) {
       throw new NotFoundException(`Driver with ID ${driverId} not found`);
     }
@@ -38,7 +48,9 @@ export class CompanyDriverService {
       where: { company: { id: companyId }, driver: { id: driverId } },
     });
     if (existingRelation) {
-      throw new BadRequestException('This company-driver relationship already exists');
+      throw new BadRequestException(
+        'This company-driver relationship already exists',
+      );
     }
 
     const companyDriver = this.companyDriverRepository.create({
@@ -76,7 +88,9 @@ export class CompanyDriverService {
         where: { id: updateCompanyDriverDto.companyId },
       });
       if (!company) {
-        throw new NotFoundException(`Company with ID ${updateCompanyDriverDto.companyId} not found`);
+        throw new NotFoundException(
+          `Company with ID ${updateCompanyDriverDto.companyId} not found`,
+        );
       }
       companyDriver.company = company;
     }
@@ -86,7 +100,9 @@ export class CompanyDriverService {
         where: { id: updateCompanyDriverDto.driverId },
       });
       if (!driver) {
-        throw new NotFoundException(`Driver with ID ${updateCompanyDriverDto.driverId} not found`);
+        throw new NotFoundException(
+          `Driver with ID ${updateCompanyDriverDto.driverId} not found`,
+        );
       }
       companyDriver.driver = driver;
     }

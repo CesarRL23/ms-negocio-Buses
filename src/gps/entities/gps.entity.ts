@@ -1,23 +1,27 @@
-import { Bus } from "../../bus/entities/bus.entity";
-import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Bus } from '../../bus/entities/bus.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('gps')
 export class Gps {
-    @PrimaryGeneratedColumn()
-    id?: number;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column()
-    codigo?: string;
+  @Column()
+  codigo?: string;
 
-    @Column()
-    latitud?: number;
+  @Column()
+  latitud?: number;
 
-    @Column()
-    longitud?: number;
+  @Column()
+  longitud?: number;
 
-
-    @OneToOne(() => Bus, bus => bus.gps)
-    @JoinColumn()
-    bus?: Bus;
-
+  @OneToOne(() => Bus, (bus) => bus.gps)
+  @JoinColumn()
+  bus?: Bus;
 }

@@ -1,17 +1,13 @@
-    import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
+@Entity('person')
+export class Person {
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Entity('person')
-    export class Person {
+  @Column()
+  nombre?: string;
 
-        @PrimaryGeneratedColumn()
-        id?: number;
-
-        @Column()
-        nombre?: string;
-
-
-        @Column({ nullable: true })
-        userId?: string;
-        
-    }
+  @Column({ nullable: true })
+  userId?: string;
+}

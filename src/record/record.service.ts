@@ -34,7 +34,10 @@ export class RecordService {
     return record;
   }
 
-  async update(id: number, updateRecordDto: UpdateRecordDto): Promise<ValidationRecord> {
+  async update(
+    id: number,
+    updateRecordDto: UpdateRecordDto,
+  ): Promise<ValidationRecord> {
     await this.findOne(id);
     await this.recordRepository.update(id, updateRecordDto);
     return await this.findOne(id);

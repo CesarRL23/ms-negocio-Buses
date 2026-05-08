@@ -25,7 +25,7 @@ export class BusService {
     if (companyId) {
       return await this.busRepository.find({
         where: { company: { id: companyId } },
-        relations: ['company']
+        relations: ['company'],
       });
     }
     return await this.busRepository.find({ relations: ['company'] });

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { GpsService } from './gps.service';
 import { CreateGpsDto } from './dto/create-gp.dto';
 import { UpdateGpDto } from './dto/update-gp.dto';

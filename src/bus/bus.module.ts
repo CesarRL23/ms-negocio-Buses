@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Gps } from 'src/gps/entities/gps.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Bus,Gps])],
+  imports: [TypeOrmModule.forFeature([Bus, Gps])],
   controllers: [BusController],
   providers: [BusService],
 })

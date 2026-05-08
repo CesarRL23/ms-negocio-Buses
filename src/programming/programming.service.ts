@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Programming } from './entities/programming.entity';
@@ -12,13 +16,19 @@ export class ProgrammingService {
     private readonly programmingRepository: Repository<Programming>,
   ) {}
 
-  async create(createProgrammingDto: CreateProgrammingDto): Promise<Programming> {
+  async create(
+    createProgrammingDto: CreateProgrammingDto,
+  ): Promise<Programming> {
     try {
-      const programming = this.programmingRepository.create(createProgrammingDto);
+      const programming =
+        this.programmingRepository.create(createProgrammingDto);
       return await this.programmingRepository.save(programming);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al crear la programación: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al crear la programación: ' + errorMessage,
+      );
     }
   }
 
@@ -41,7 +51,10 @@ export class ProgrammingService {
     return programming;
   }
 
-  async update(id: number, updateProgrammingDto: UpdateProgrammingDto): Promise<Programming> {
+  async update(
+    id: number,
+    updateProgrammingDto: UpdateProgrammingDto,
+  ): Promise<Programming> {
     const programming = await this.findOne(id);
 
     Object.assign(programming, updateProgrammingDto);
@@ -49,8 +62,11 @@ export class ProgrammingService {
     try {
       return await this.programmingRepository.save(programming);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al actualizar la programación: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al actualizar la programación: ' + errorMessage,
+      );
     }
   }
 
@@ -61,8 +77,11 @@ export class ProgrammingService {
       await this.programmingRepository.remove(programming);
       return { message: `Programación con ID ${id} eliminada correctamente` };
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al eliminar la programación: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al eliminar la programación: ' + errorMessage,
+      );
     }
   }
 }

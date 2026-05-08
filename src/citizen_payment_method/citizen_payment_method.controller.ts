@@ -1,15 +1,27 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { CitizenPaymentMethodService } from './citizen_payment_method.service';
 import { CreateCitizenPaymentMethodDto } from './dto/create-citizen_payment_method.dto';
 import { UpdateCitizenPaymentMethodDto } from './dto/update-citizen_payment_method.dto';
 
 @Controller('citizen-payment-method')
 export class CitizenPaymentMethodController {
-  constructor(private readonly citizenPaymentMethodService: CitizenPaymentMethodService) {}
+  constructor(
+    private readonly citizenPaymentMethodService: CitizenPaymentMethodService,
+  ) {}
 
   @Post()
   create(@Body() createCitizenPaymentMethodDto: CreateCitizenPaymentMethodDto) {
-    return this.citizenPaymentMethodService.create(createCitizenPaymentMethodDto);
+    return this.citizenPaymentMethodService.create(
+      createCitizenPaymentMethodDto,
+    );
   }
 
   @Get()
@@ -23,8 +35,14 @@ export class CitizenPaymentMethodController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCitizenPaymentMethodDto: UpdateCitizenPaymentMethodDto) {
-    return this.citizenPaymentMethodService.update(+id, updateCitizenPaymentMethodDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateCitizenPaymentMethodDto: UpdateCitizenPaymentMethodDto,
+  ) {
+    return this.citizenPaymentMethodService.update(
+      +id,
+      updateCitizenPaymentMethodDto,
+    );
   }
 
   @Delete(':id')

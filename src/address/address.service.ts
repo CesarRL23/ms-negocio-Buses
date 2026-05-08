@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-
 
 import { Citizen } from '../citizen/entities/citizen.entity';
 import { CreateAddressDto } from './dto/create-address.dto';
@@ -9,7 +12,6 @@ import { Address } from './entities/address.entity';
 
 @Injectable()
 export class AddressService {
-
   constructor(
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
@@ -18,9 +20,10 @@ export class AddressService {
     private readonly citizenRepository: Repository<Citizen>,
   ) {}
 
- 
-  async createForCitizen(citizenId: number, dto: CreateAddressDto): Promise<Address> {
-
+  async createForCitizen(
+    citizenId: number,
+    dto: CreateAddressDto,
+  ): Promise<Address> {
     const citizen = await this.citizenRepository.findOne({
       where: { id: citizenId },
       relations: ['address'],
@@ -41,9 +44,7 @@ export class AddressService {
     return citizen.address;
   }
 
- 
   async findByCitizen(citizenId: number): Promise<Address> {
-
     const citizen = await this.citizenRepository.findOne({
       where: { id: citizenId },
       relations: ['address'],
@@ -60,9 +61,10 @@ export class AddressService {
     return citizen.address;
   }
 
-  
-  async update(citizenId: number, dto: Partial<CreateAddressDto>): Promise<Address> {
-
+  async update(
+    citizenId: number,
+    dto: Partial<CreateAddressDto>,
+  ): Promise<Address> {
     const citizen = await this.citizenRepository.findOne({
       where: { id: citizenId },
       relations: ['address'],
@@ -80,7 +82,6 @@ export class AddressService {
   }
 
   async remove(citizenId: number): Promise<void> {
-
     const citizen = await this.citizenRepository.findOne({
       where: { id: citizenId },
       relations: ['address'],

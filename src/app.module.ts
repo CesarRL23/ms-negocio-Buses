@@ -20,6 +20,9 @@ import { PaymentMethodModule } from './payment_method/payment_method.module';
 import { CitizenPaymentMethodModule } from './citizen_payment_method/citizen_payment_method.module';
 import { SecurityGuard } from './guards/security.guard';
 import { CompanyDriverModule } from './company_driver/company_driver.module';
+import { IncidenteModule } from './incidente/incidente.module';
+import { IncidenteBusModule } from './incidente_bus/incidente_bus.module';
+import { FotoModule } from './foto/foto.module';
 
 @Module({
   imports: [
@@ -75,8 +78,9 @@ import { CompanyDriverModule } from './company_driver/company_driver.module';
     CitizenPaymentMethodModule,
 
     CompanyDriverModule,
-
-    
+    IncidenteModule,
+    IncidenteBusModule,
+    FotoModule,
   ],
   providers: [
     {

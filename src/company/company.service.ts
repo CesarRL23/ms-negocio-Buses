@@ -29,7 +29,10 @@ export class CompanyService {
     return company;
   }
 
-  async update(id: number, updateCompanyDto: UpdateCompanyDto): Promise<Company> {
+  async update(
+    id: number,
+    updateCompanyDto: UpdateCompanyDto,
+  ): Promise<Company> {
     await this.findOne(id);
     await this.companyRepository.update(id, updateCompanyDto);
     return await this.findOne(id);

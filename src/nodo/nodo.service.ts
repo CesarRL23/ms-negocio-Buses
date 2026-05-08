@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Nodo } from './entities/nodo.entity';
@@ -17,7 +21,8 @@ export class NodoService {
       const nodo = this.nodoRepository.create(createNodoDto);
       return await this.nodoRepository.save(nodo);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
       throw new BadRequestException('Error al crear el nodo: ' + errorMessage);
     }
   }
@@ -49,8 +54,11 @@ export class NodoService {
     try {
       return await this.nodoRepository.save(nodo);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al actualizar el nodo: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al actualizar el nodo: ' + errorMessage,
+      );
     }
   }
 
@@ -61,8 +69,11 @@ export class NodoService {
       await this.nodoRepository.remove(nodo);
       return { message: `Nodo con ID ${id} eliminado correctamente` };
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
-      throw new BadRequestException('Error al eliminar el nodo: ' + errorMessage);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      throw new BadRequestException(
+        'Error al eliminar el nodo: ' + errorMessage,
+      );
     }
   }
 }

@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WhereaboutsService } from './whereabouts.service';
 import { CreateWhereaboutDto } from './dto/create-whereabout.dto';
 import { UpdateWhereaboutDto } from './dto/update-whereabout.dto';
@@ -23,7 +31,10 @@ export class WhereaboutsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWhereaboutDto: UpdateWhereaboutDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateWhereaboutDto: UpdateWhereaboutDto,
+  ) {
     return this.whereaboutsService.update(+id, updateWhereaboutDto);
   }
 

@@ -4,6 +4,4 @@ export class CreateCitizenDto {
   @IsNotEmpty()
   @IsNumber()
   personId?: number;
-
-  
 }
