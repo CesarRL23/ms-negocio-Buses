@@ -17,6 +17,27 @@ export class PersonService {
     return await this.personRepository.save(person);
   }
 
+  async sync(createPersonDto: CreatePersonDto): Promise<Person> {
+    const userId = createPersonDto.userId;
+
+    if (userId) {
+      const existing = await this.personRepository.findOne({
+        where: { userId },
+      });
+      if (existing) {
+        const nextNombre = createPersonDto.nombre || existing.nombre;
+        if (nextNombre && nextNombre !== existing.nombre) {
+          existing.nombre = nextNombre;
+          return await this.personRepository.save(existing);
+        }
+        return existing;
+      }
+    }
+
+    const person = this.personRepository.create(createPersonDto);
+    return await this.personRepository.save(person);
+  }
+
   async findAll(): Promise<Person[]> {
     return await this.personRepository.find();
   }

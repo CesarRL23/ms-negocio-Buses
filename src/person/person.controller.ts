@@ -20,6 +20,11 @@ export class PersonController {
     return this.personService.create(createPersonDto);
   }
 
+  @Post('sync')
+  sync(@Body() createPersonDto: CreatePersonDto) {
+    return this.personService.sync(createPersonDto);
+  }
+
   @Get()
   findAll() {
     return this.personService.findAll();
