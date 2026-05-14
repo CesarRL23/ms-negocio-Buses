@@ -30,6 +30,20 @@ export class SecurityGuard implements CanActivate {
       return true;
     }
 
+    const publicReadRoutes = ['/whereabouts', '/route', '/nodo'];
+    const isPublicReadRoute =
+      method === 'GET' &&
+      publicReadRoutes.some(
+        (route) => cleanUrl === route || cleanUrl.startsWith(`${route}/`),
+      );
+
+    if (isPublicReadRoute) {
+      this.logger.log(
+        `Bypassing permission validation for public read route -> URL: ${cleanUrl} Method: ${method}`,
+      );
+      return true;
+    }
+
     const permissionData = { url: cleanUrl, method };
 
     try {
