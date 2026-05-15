@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Shift } from '../../shift/entities/shift.entity';
 import { CompanyDriver } from '../../company_driver/entities/company_driver.entity';
+import { Programming } from '../../programming/entities/programming.entity';
 
 @Entity('drivers')
 export class Driver {
@@ -25,4 +26,7 @@ export class Driver {
 
   @OneToMany(() => CompanyDriver, (companyDriver) => companyDriver.driver)
   companyDrivers?: CompanyDriver[];
+
+  @OneToMany(() => Programming, (programming) => programming.driver)
+  programmings?: Programming[];
 }

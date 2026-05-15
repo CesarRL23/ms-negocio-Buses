@@ -39,4 +39,12 @@ export class ShiftController {
   remove(@Param('id') id: string) {
     return this.shiftService.remove(+id);
   }
+
+  @Patch(':id/start')
+  startShift(
+    @Param('id') id: string,
+    @Body() data: { estado_bus: boolean; observaciones_bus?: string },
+  ) {
+    return this.shiftService.startShift(+id, data);
+  }
 }

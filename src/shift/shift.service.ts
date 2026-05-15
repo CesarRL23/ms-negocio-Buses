@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Shift } from './entities/shift.entity';
@@ -43,5 +43,20 @@ export class ShiftService {
   async remove(id: number): Promise<void> {
     const shift = await this.findOne(id);
     await this.shiftRepository.remove(shift);
+  }
+
+  async startShift(id: number, data: { estado_bus: boolean; observaciones_bus?: string }): Promise<Shift> {
+    const shift = await this.findOne(id);
+    
+    if (shift.estado === 'EN CURSO') {
+      throw new BadRequestException('El turno ya está en curso');
+    }
+    
+    shift.estado = 'EN CURSO';
+    shift.estado_bus = data.estado_bus;
+    shift.observaciones_bus = data.observaciones_bus;
+    shift.hora_inicio_real = new Date();
+    
+    return await this.shiftRepository.save(shift);
   }
 }

@@ -18,22 +18,36 @@ export class CreateProgrammingDto {
   busId?: number;
 
   @IsNotEmpty()
-  @Type(() => Date)
-  @IsDate()
-  fechaInicio?: Date;
+  @IsNumber()
+  driverId?: number;
 
   @IsNotEmpty()
-  @Type(() => Date)
-  @IsDate()
-  fechaFin?: Date;
+  @IsString()
+  fecha?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   horaSalida?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   horaLlegada?: string;
+
+  @IsOptional()
+  @IsNumber()
+  margenTolerancia?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  esRecurrente?: boolean;
+
+  @IsOptional()
+  @IsString()
+  tipoRecurrencia?: string;
+
+  @IsOptional()
+  @IsString()
+  estado?: string;
 
   @IsOptional()
   @IsBoolean()

@@ -1,10 +1,5 @@
 import {
-  IsString,
-  IsEmail,
-  IsNotEmpty,
-  MinLength,
-  IsOptional,
-  IsNumber,
+  IsString,IsNotEmpty,IsOptional,
 } from 'class-validator';
 
 export class CreatePersonDto {
@@ -15,4 +10,7 @@ export class CreatePersonDto {
   @IsOptional()
   @IsString()
   userId?: string;
+
+  @IsOptional()
+  roles?: string[];
 }

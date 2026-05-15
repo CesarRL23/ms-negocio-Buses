@@ -16,14 +16,23 @@ export class Shift {
   @Column()
   fecha?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   hora_inicio?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   hora_fin?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   estado?: string;
+
+  @Column({ nullable: true })
+  estado_bus?: boolean;
+
+  @Column({ nullable: true })
+  observaciones_bus?: string;
+
+  @Column({ nullable: true })
+  hora_inicio_real?: Date;
 
   // 🔥 RELACIONES CORRECTAS
 
