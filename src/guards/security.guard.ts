@@ -30,7 +30,12 @@ export class SecurityGuard implements CanActivate {
       return true;
     }
 
-    const publicReadRoutes = ['/whereabouts', '/route', '/nodo'];
+    const publicReadRoutes = [
+      '/whereabouts',
+      '/route',
+      '/nodo',
+      '/programming',
+    ];
     const isPublicReadRoute =
       method === 'GET' &&
       publicReadRoutes.some(

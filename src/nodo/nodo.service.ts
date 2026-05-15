@@ -8,6 +8,15 @@ import { Repository } from 'typeorm';
 import { Nodo } from './entities/nodo.entity';
 import { CreateNodoDto } from './dto/create-nodo.dto';
 import { UpdateNodoDto } from './dto/update-nodo.dto';
+import { Route } from '../route/entities/route.entity';
+import { Whereabouts } from '../whereabouts/entities/whereabout.entity';
+
+const buildNodoRelations = (dto: CreateNodoDto | UpdateNodoDto) => ({
+  ...(dto.routeId !== undefined ? { route: { id: dto.routeId } as Route } : {}),
+  ...(dto.whereaboutId !== undefined
+    ? { stop: { id: dto.whereaboutId } as Whereabouts }
+    : {}),
+});
 
 @Injectable()
 export class NodoService {
@@ -18,7 +27,12 @@ export class NodoService {
 
   async create(createNodoDto: CreateNodoDto): Promise<Nodo> {
     try {
-      const nodo = this.nodoRepository.create(createNodoDto);
+      const nodo = this.nodoRepository.create({
+        orden: createNodoDto.orden,
+        distanciaDesdeAnterior: createNodoDto.distanciaDesdeAnterior,
+        tiempoEstimadoDesdeAnterior: createNodoDto.tiempoEstimadoDesdeAnterior,
+        ...buildNodoRelations(createNodoDto),
+      });
       return await this.nodoRepository.save(nodo);
     } catch (error: unknown) {
       const errorMessage =
@@ -49,7 +63,15 @@ export class NodoService {
   async update(id: number, updateNodoDto: UpdateNodoDto): Promise<Nodo> {
     const nodo = await this.findOne(id);
 
-    Object.assign(nodo, updateNodoDto);
+    Object.assign(nodo, {
+      orden: updateNodoDto.orden ?? nodo.orden,
+      distanciaDesdeAnterior:
+        updateNodoDto.distanciaDesdeAnterior ?? nodo.distanciaDesdeAnterior,
+      tiempoEstimadoDesdeAnterior:
+        updateNodoDto.tiempoEstimadoDesdeAnterior ??
+        nodo.tiempoEstimadoDesdeAnterior,
+      ...buildNodoRelations(updateNodoDto),
+    });
 
     try {
       return await this.nodoRepository.save(nodo);

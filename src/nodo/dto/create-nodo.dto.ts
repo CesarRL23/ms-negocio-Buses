@@ -12,4 +12,12 @@ export class CreateNodoDto {
   @IsOptional()
   @IsNumber()
   orden?: number;
+
+  @IsOptional()
+  @IsNumber()
+  distanciaDesdeAnterior?: number;
+
+  @IsOptional()
+  @IsNumber()
+  tiempoEstimadoDesdeAnterior?: number;
 }

@@ -4,6 +4,7 @@ import { ValidationRecord } from '../../record/entities/record.entity';
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -24,9 +25,11 @@ export class Nodo {
   tiempoEstimadoDesdeAnterior?: number;
 
   @ManyToOne(() => Whereabouts, (whereabouts) => whereabouts.nodos)
+  @JoinColumn({ name: 'stopId' })
   stop?: Whereabouts;
 
   @ManyToOne(() => Route, (route) => route.nodos)
+  @JoinColumn({ name: 'routeId' })
   route?: Route;
 
   @OneToMany(
