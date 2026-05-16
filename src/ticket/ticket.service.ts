@@ -22,11 +22,11 @@ export class TicketService {
     private readonly paymentMethodRepository: Repository<PaymentMethod>,
     @InjectRepository(ValidationRecord)
     private readonly recordRepository: Repository<ValidationRecord>,
-  ) {}
+  ) { }
 
   async board(data: { programmingId: number; citizenPaymentMethodId: number; nodoId: number }) {
     const { programmingId, citizenPaymentMethodId, nodoId } = data;
-    
+
     // 1. Identificar la programación y el bus
     const programming = await this.programmingRepository.findOne({
       where: { id: programmingId },
@@ -54,12 +54,12 @@ export class TicketService {
 
     const TARIFA = 3000; // Tarifa estándar
     const saldo = Number(cpm.paymentMethod.saldo || 0);
-    
+
     // Para simplificar, descontamos asumiendo que todo saldo se puede restar si no es efectivo, o simplemente lo descontamos siempre
     if (saldo < TARIFA) {
       throw new BadRequestException('Saldo insuficiente para abordar');
     }
-    
+
     // Descontar saldo
     cpm.paymentMethod.saldo = saldo - TARIFA;
     await this.paymentMethodRepository.save(cpm.paymentMethod);
@@ -97,7 +97,7 @@ export class TicketService {
 
     const ticket = await this.ticketRepository.findOne({ where: { id: ticketId } });
     if (!ticket) throw new NotFoundException('Boleto no encontrado');
-    
+
     if (ticket.estado !== 'ACTIVO') {
       throw new BadRequestException('El boleto no está activo');
     }
@@ -142,6 +142,53 @@ export class TicketService {
       throw new NotFoundException(`Ticket with ID ${id} not found`);
     }
     return ticket;
+  }
+
+  async getTripDetails(ticketId: number) {
+    const ticket = await this.ticketRepository.findOne({
+      where: { id: ticketId },
+      relations: [
+        'programming',
+        'programming.bus',
+        'programming.driver',
+        'programming.driver.person',
+        'programming.route',
+        'programming.route.nodos',
+        'programming.route.nodos.stop',
+        'validationRecords',
+        'validationRecords.nodo',
+        'validationRecords.nodo.stop'
+      ]
+    });
+
+    if (!ticket) throw new NotFoundException('Viaje no encontrado');
+
+    const abordaje = ticket.validationRecords?.find(r => r.type === 'ABORDAJE');
+    const descenso = ticket.validationRecords?.find(r => r.type === 'DESCENSO');
+
+    let tiempoTotalMinutos = 0;
+    if (abordaje && descenso && abordaje.timestamp && descenso.timestamp) {
+      const ms = new Date(descenso.timestamp).getTime() - new Date(abordaje.timestamp).getTime();
+      tiempoTotalMinutos = Math.round(ms / 60000);
+    }
+
+    return {
+      ticketInfo: {
+        id: ticket.id,
+        codigo: ticket.codigo,
+        estado: ticket.estado,
+        precio: ticket.precio,
+        fechaCompra: ticket.fechaCompra,
+      },
+      bus: ticket.programming?.bus,
+      conductor: ticket.programming?.driver?.person,
+      ruta: ticket.programming?.route,
+      validaciones: {
+        abordaje: abordaje || null,
+        descenso: descenso || null,
+      },
+      tiempoTotalMinutos
+    };
   }
 
   async update(id: number, updateTicketDto: UpdateTicketDto): Promise<Ticket> {

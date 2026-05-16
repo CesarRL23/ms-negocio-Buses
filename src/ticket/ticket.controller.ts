@@ -13,7 +13,7 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Controller('ticket')
 export class TicketController {
-  constructor(private readonly ticketService: TicketService) {}
+  constructor(private readonly ticketService: TicketService) { }
 
   @Post()
   create(@Body() createTicketDto: CreateTicketDto) {
@@ -38,6 +38,11 @@ export class TicketController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ticketService.findOne(+id);
+  }
+
+  @Get(':id/trip-details')
+  getTripDetails(@Param('id') id: string) {
+    return this.ticketService.getTripDetails(+id);
   }
 
   @Patch(':id')
