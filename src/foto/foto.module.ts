@@ -9,5 +9,6 @@ import { IncidenteBus } from '../incidente_bus/entities/incidente_bus.entity';
   imports: [TypeOrmModule.forFeature([Foto, IncidenteBus])],
   controllers: [FotoController],
   providers: [FotoService],
+  exports: [FotoService],
 })
 export class FotoModule {}

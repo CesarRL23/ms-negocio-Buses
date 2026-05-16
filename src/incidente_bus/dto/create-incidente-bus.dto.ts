@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsArray, MaxLength } from 'class-validator';
 
 export class CreateIncidenteBusDto {
   @IsNotEmpty()
@@ -12,4 +12,11 @@ export class CreateIncidenteBusDto {
   @IsOptional()
   @IsString()
   notas?: string;
+
+  @IsOptional()
+  @IsArray()
+  @MaxLength(5, {
+    message: 'Máximo 5 fotos permitidas por incidente',
+  })
+  fotoUrls?: string[];
 }

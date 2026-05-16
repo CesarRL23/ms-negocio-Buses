@@ -10,5 +10,6 @@ import { Bus } from '../bus/entities/bus.entity';
   imports: [TypeOrmModule.forFeature([Shift, Driver, Bus])],
   controllers: [ShiftController],
   providers: [ShiftService],
+  exports: [ShiftService],
 })
 export class ShiftModule {}

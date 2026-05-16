@@ -4,9 +4,11 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Driver } from '../../driver/entities/driver.entity';
 import { Bus } from '../../bus/entities/bus.entity';
+import { Incidente } from '../../incidente/entities/incidente.entity';
 
 @Entity('shift')
 export class Shift {
@@ -43,4 +45,7 @@ export class Shift {
   @ManyToOne(() => Bus, (bus) => bus.shifts)
   @JoinColumn({ name: 'bus_id' })
   bus?: Bus;
+
+  @OneToMany(() => Incidente, (incidente) => incidente.shift)
+  incidentes?: Incidente[];
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Foto } from './entities/foto.entity';
@@ -44,5 +44,23 @@ export class FotoService {
   async remove(id: number): Promise<void> {
     const f = await this.findOne(id);
     await this.fotoRepository.remove(f);
+  }
+
+  async countByIncidenteBus(incidenteBusId: number): Promise<number> {
+    return this.fotoRepository.count({
+      where: { incidenteBus: { id: incidenteBusId } },
+    });
+  }
+
+  async validatePhotoLimitForIncidenteBus(
+    incidenteBusId: number,
+    additionalCount: number = 1,
+  ): Promise<void> {
+    const currentCount = await this.countByIncidenteBus(incidenteBusId);
+    if (currentCount + additionalCount > 5) {
+      throw new BadRequestException(
+        `Se alcanzó el límite de 5 fotos. Actualmente: ${currentCount}, solicitadas: ${additionalCount}`,
+      );
+    }
   }
 }
