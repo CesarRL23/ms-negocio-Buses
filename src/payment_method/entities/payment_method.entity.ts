@@ -12,6 +12,9 @@ export class PaymentMethod {
   @Column({ nullable: true })
   provider?: string; // VISA, MASTERCARD, NEQUI, DAVIPLATA
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  saldo?: number;
+
   @Column({ nullable: true })
   accountNumber?: string; // número tarjeta o celular
 

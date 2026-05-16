@@ -20,6 +20,16 @@ export class TicketController {
     return this.ticketService.create(createTicketDto);
   }
 
+  @Post('board')
+  board(@Body() data: { programmingId: number; citizenPaymentMethodId: number; nodoId: number }) {
+    return this.ticketService.board(data);
+  }
+
+  @Post('alight')
+  alight(@Body() data: { ticketId: number; nodoId: number }) {
+    return this.ticketService.alight(data);
+  }
+
   @Get()
   findAll() {
     return this.ticketService.findAll();

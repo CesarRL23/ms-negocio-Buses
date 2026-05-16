@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 export class CreatePaymentMethodDto {
   @IsNotEmpty()
@@ -16,4 +16,7 @@ export class CreatePaymentMethodDto {
   @IsNotEmpty()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  saldo?: number;
 }

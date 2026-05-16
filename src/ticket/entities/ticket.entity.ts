@@ -23,7 +23,7 @@ export class Ticket {
   @Column()
   fechaCompra?: Date;
 
-  @Column()
+  @Column({ nullable: true })
   FechaUso?: Date;
 
   @Column()
