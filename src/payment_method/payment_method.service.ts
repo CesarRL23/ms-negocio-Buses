@@ -39,6 +39,12 @@ export class PaymentMethodService {
     return await this.findOne(id);
   }
 
+  async recharge(id: number, amount: number) {
+    const paymentMethod = await this.findOne(id);
+    paymentMethod.saldo = Number(paymentMethod.saldo) + Number(amount);
+    return await this.paymentMethodRepository.save(paymentMethod);
+  }
+
   async remove(id: number) {
     const paymentMethod = await this.findOne(id);
     await this.paymentMethodRepository.delete(id);

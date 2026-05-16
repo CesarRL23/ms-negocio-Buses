@@ -26,10 +26,23 @@ export class CitizenService {
   async findOne(id: number): Promise<Citizen> {
     const citizen = await this.citizenRepository.findOne({
       where: { id },
-      relations: ['person'],
+      relations: ['person', 'paymentMethods', 'paymentMethods.paymentMethod'],
     });
     if (!citizen) {
       throw new NotFoundException(`Citizen with ID ${id} not found`);
+    }
+    return citizen;
+  }
+
+  async findByPersonId(personId: number): Promise<Citizen> {
+    const citizen = await this.citizenRepository.findOne({
+      where: { person: { id: personId } },
+      relations: ['person', 'paymentMethods', 'paymentMethods.paymentMethod'],
+    });
+    if (!citizen) {
+      throw new NotFoundException(
+        `Citizen with Person ID ${personId} not found`,
+      );
     }
     return citizen;
   }

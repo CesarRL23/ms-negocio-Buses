@@ -30,6 +30,11 @@ export class CitizenController {
     return this.citizenService.findOne(+id);
   }
 
+  @Get('person/:personId')
+  findByPersonId(@Param('personId') personId: string) {
+    return this.citizenService.findByPersonId(+personId);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCitizenDto: UpdateCitizenDto) {
     return this.citizenService.update(+id, updateCitizenDto);

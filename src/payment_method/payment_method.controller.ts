@@ -38,6 +38,11 @@ export class PaymentMethodController {
     return this.paymentMethodService.update(+id, updatePaymentMethodDto);
   }
 
+  @Post(':id/recharge')
+  recharge(@Param('id') id: string, @Body('amount') amount: number) {
+    return this.paymentMethodService.recharge(+id, amount);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.paymentMethodService.remove(+id);
