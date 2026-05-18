@@ -47,4 +47,9 @@ export class ShiftController {
   ) {
     return this.shiftService.startShift(+id, data);
   }
+
+  @Patch(':id/end')
+  endShift(@Param('id') id: string) {
+    return this.shiftService.endShift(+id);
+  }
 }

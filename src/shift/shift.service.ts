@@ -59,4 +59,17 @@ export class ShiftService {
     
     return await this.shiftRepository.save(shift);
   }
+
+  async endShift(id: number): Promise<Shift> {
+    const shift = await this.findOne(id);
+    
+    if (shift.estado !== 'EN CURSO') {
+      throw new BadRequestException('El turno no está en curso o ya fue finalizado');
+    }
+    
+    shift.estado = 'COMPLETADO';
+    shift.hora_fin_real = new Date();
+    
+    return await this.shiftRepository.save(shift);
+  }
 }
