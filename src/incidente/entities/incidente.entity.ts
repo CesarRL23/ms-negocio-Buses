@@ -2,6 +2,12 @@ import { IncidenteBus } from '../../incidente_bus/entities/incidente_bus.entity'
 import { Column, Entity, OneToMany, ManyToOne, JoinColumn, PrimaryGeneratedColumn } from 'typeorm';
 import { Shift } from '../../shift/entities/shift.entity';
 
+export enum IncidenteEstado {
+  PENDIENTE = 'pendiente',
+  EN_REVISION = 'en_revision',
+  RESUELTO = 'resuelto',
+}
+
 @Entity('incidente')
 export class Incidente {
   @PrimaryGeneratedColumn()
@@ -27,6 +33,17 @@ export class Incidente {
 
   @Column({ type: 'text', nullable: true })
   descripcion?: string;
+
+  @Column({
+    type: 'varchar',
+    length: 20,
+    default: IncidenteEstado.PENDIENTE,
+  })
+  estado?: string;
+
+  /** Stored as a JSON string: Array of { autor, texto, timestamp } */
+  @Column({ type: 'text', nullable: true })
+  comentarios?: string;
     
   @ManyToOne(() => Shift, (shift) => shift.incidentes, { nullable: true })
   @JoinColumn({ name: 'shift_id' })

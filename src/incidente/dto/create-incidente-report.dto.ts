@@ -11,6 +11,7 @@ export enum IncidenteTipo {
   MECANICO = 'mecanico',
   ACCIDENTE = 'accidente',
   RETRASO = 'retraso',
+  PASAJEROS = 'pasajeros',
   OTRO = 'otro',
 }
 

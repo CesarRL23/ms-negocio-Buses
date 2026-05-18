@@ -9,6 +9,7 @@ export enum IncidenteTipo {
   MECANICO = 'mecanico',
   ACCIDENTE = 'accidente',
   RETRASO = 'retraso',
+  PASAJEROS = 'pasajeros',
   OTRO = 'otro',
 }
 
@@ -17,6 +18,12 @@ export enum IncidenteGravedad {
   MEDIO = 'medio',
   ALTO = 'alto',
   CRITICO = 'critico',
+}
+
+export enum IncidenteEstadoUpdate {
+  PENDIENTE = 'pendiente',
+  EN_REVISION = 'en_revision',
+  RESUELTO = 'resuelto',
 }
 
 export class UpdateIncidenteDto {
@@ -43,4 +50,8 @@ export class UpdateIncidenteDto {
   @IsOptional()
   @IsNumber()
   longitud?: number;
+
+  @IsOptional()
+  @IsEnum(IncidenteEstadoUpdate)
+  estado?: IncidenteEstadoUpdate;
 }
