@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  BadRequestException,
 } from '@nestjs/common';
 import { PaymentMethodService } from './payment_method.service';
 import { CreatePaymentMethodDto } from './dto/create-payment_method.dto';
@@ -41,6 +42,15 @@ export class PaymentMethodController {
   @Post(':id/recharge')
   recharge(@Param('id') id: string, @Body('amount') amount: number) {
     return this.paymentMethodService.recharge(+id, amount);
+  }
+
+  @Post('confirmation')
+  confirmPayment(@Body() body: any) {
+    const refPayco = body.x_ref_payco || body.ref_payco;
+    if (!refPayco) {
+      throw new BadRequestException('Falta la referencia de pago (x_ref_payco / ref_payco)');
+    }
+    return this.paymentMethodService.processEpaycoRecharge(refPayco);
   }
 
   @Delete(':id')
