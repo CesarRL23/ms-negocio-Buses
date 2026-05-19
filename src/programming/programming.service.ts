@@ -38,7 +38,8 @@ export class ProgrammingService {
       throw new BadRequestException('El bus ya tiene una programación activa en este mismo horario.');
     }
 
-    // 2. Validar que el conductor no tenga otro turno en la misma fecha (opcional, pero ayuda a evitar cruces)
+    // 2. Validar que el conductor no tenga otro turno en la misma fecha (Omitido/Deshabilitado según requerimiento)
+    /*
     const existingShift = await this.shiftRepository.findOne({
       where: {
         driver: { id: createProgrammingDto.driverId },
@@ -49,6 +50,7 @@ export class ProgrammingService {
     if (existingShift) {
       throw new BadRequestException('El conductor ya tiene un turno asignado para esta fecha.');
     }
+    */
 
     try {
       const programming = this.programmingRepository.create({
