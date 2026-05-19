@@ -30,6 +30,14 @@ export class SecurityGuard implements CanActivate {
       return true;
     }
 
+    // Allow PATCH /person/:id (user can update own profile)
+    if (cleanUrl.match(/^\/person\/\d+$/) && method === 'PATCH') {
+      this.logger.log(
+        `Bypassing permission validation for personal update route -> URL: ${cleanUrl} Method: ${method}`,
+      );
+      return true;
+    }
+
     const publicReadRoutes = [
       '/whereabouts',
       '/route',

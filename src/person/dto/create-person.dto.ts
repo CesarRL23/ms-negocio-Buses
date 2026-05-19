@@ -1,6 +1,6 @@
-import {
-  IsString,IsNotEmpty,IsOptional,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+
+import { Type } from 'class-transformer';
 
 export class CreatePersonDto {
   @IsNotEmpty()
@@ -13,4 +13,9 @@ export class CreatePersonDto {
 
   @IsOptional()
   roles?: string[];
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  edad?: number;
 }

@@ -7,6 +7,7 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 
 import { Citizen } from '../citizen/entities/citizen.entity';
 import { Driver } from '../driver/entities/driver.entity';
+import { MarketingAnalyst } from '../marketint-analyst/entities/marketint-analyst.entity';
 
 @Injectable()
 export class PersonService {
@@ -17,6 +18,8 @@ export class PersonService {
     private readonly citizenRepository: Repository<Citizen>,
     @InjectRepository(Driver)
     private readonly driverRepository: Repository<Driver>,
+    @InjectRepository(MarketingAnalyst)
+    private readonly marketingAnalystRepository: Repository<MarketingAnalyst>,
   ) {}
 
   async create(createPersonDto: CreatePersonDto): Promise<Person> {
@@ -45,7 +48,7 @@ export class PersonService {
         person = await this.personRepository.save(person);
       }
 
-      // Automatically sync Citizen / Driver based on passed roles
+      // Automatically sync Citizen / Driver / MarketingAnalyst based on passed roles
       try {
         const userRoles = createPersonDto.roles || [];
         const roleNames = userRoles.map((r: string) => r.toUpperCase());
@@ -65,6 +68,15 @@ export class PersonService {
           if (!existingDriver) {
             const driver = this.driverRepository.create({ person: { id: person.id } });
             await this.driverRepository.save(driver);
+          }
+        }
+
+        // Si el usuario tiene rol MARKETING_ANALYST o ANALISTA_DE_MARKETING
+        if (roleNames.includes('MARKETING_ANALYST') || roleNames.includes('ANALISTA_DE_MARKETING')) {
+          const existingAnalyst = await this.marketingAnalystRepository.findOne({ where: { person: { id: person.id } } });
+          if (!existingAnalyst) {
+            const analyst = this.marketingAnalystRepository.create({ person: { id: person.id } });
+            await this.marketingAnalystRepository.save(analyst);
           }
         }
       } catch (err) {

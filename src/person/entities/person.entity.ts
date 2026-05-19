@@ -18,4 +18,7 @@ export class Person {
 
   @OneToMany(() => PersonGroup, (personGroup) => personGroup.person)
   personGroups?: PersonGroup[];
+
+  @Column({ type: 'int', nullable: true })
+  edad?: number;
 }
