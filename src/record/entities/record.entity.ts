@@ -7,7 +7,7 @@ export class ValidationRecord {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @ManyToOne(() => Ticket, (ticket) => ticket.validationRecords)
+  @ManyToOne(() => Ticket, (ticket) => ticket.validationRecords, { onDelete: 'CASCADE' })
   ticket?: Ticket;
 
   @ManyToOne(() => Nodo, (nodo) => nodo.validationRecords)

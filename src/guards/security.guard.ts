@@ -44,6 +44,7 @@ export class SecurityGuard implements CanActivate {
       '/nodo',
       '/programming',
       '/ticket',
+      '/company-admin',
     ];
     const isPublicReadRoute =
       method === 'GET' &&

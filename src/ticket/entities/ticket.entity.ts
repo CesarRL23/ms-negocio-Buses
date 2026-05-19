@@ -36,7 +36,7 @@ export class Ticket {
   @Column({ nullable: true })
   citizenPaymentMethodId?: number;
 
-  @ManyToOne(() => Programming, (programming) => programming.id)
+  @ManyToOne(() => Programming, (programming) => programming.tickets, { onDelete: 'CASCADE' })
   programming?: Programming;
 
   @ManyToOne(

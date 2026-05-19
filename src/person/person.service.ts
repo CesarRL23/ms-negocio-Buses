@@ -60,6 +60,11 @@ export class PersonService {
             const citizen = this.citizenRepository.create({ person: { id: person.id } });
             await this.citizenRepository.save(citizen);
           }
+        } else {
+          const existingCitizen = await this.citizenRepository.findOne({ where: { person: { id: person.id } } });
+          if (existingCitizen) {
+            await this.citizenRepository.remove(existingCitizen);
+          }
         }
 
         // Si el usuario tiene rol DRIVER o CONDUCTOR
@@ -69,6 +74,11 @@ export class PersonService {
             const driver = this.driverRepository.create({ person: { id: person.id } });
             await this.driverRepository.save(driver);
           }
+        } else {
+          const existingDriver = await this.driverRepository.findOne({ where: { person: { id: person.id } } });
+          if (existingDriver) {
+            await this.driverRepository.remove(existingDriver);
+          }
         }
 
         // Si el usuario tiene rol MARKETING_ANALYST o ANALISTA_DE_MARKETING
@@ -77,6 +87,11 @@ export class PersonService {
           if (!existingAnalyst) {
             const analyst = this.marketingAnalystRepository.create({ person: { id: person.id } });
             await this.marketingAnalystRepository.save(analyst);
+          }
+        } else {
+          const existingAnalyst = await this.marketingAnalystRepository.findOne({ where: { person: { id: person.id } } });
+          if (existingAnalyst) {
+            await this.marketingAnalystRepository.remove(existingAnalyst);
           }
         }
       } catch (err) {

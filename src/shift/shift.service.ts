@@ -19,14 +19,14 @@ export class ShiftService {
 
   async findAll(): Promise<Shift[]> {
     return await this.shiftRepository.find({
-      relations: ['driver', 'bus'],
+      relations: ['driver', 'driver.person', 'bus'],
     });
   }
 
   async findOne(id: number): Promise<Shift> {
     const shift = await this.shiftRepository.findOne({
       where: { id },
-      relations: ['driver', 'bus'],
+      relations: ['driver', 'driver.person', 'bus'],
     });
     if (!shift) {
       throw new NotFoundException(`Shift with ID ${id} not found`);
