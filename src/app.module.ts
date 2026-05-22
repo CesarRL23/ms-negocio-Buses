@@ -29,6 +29,7 @@ import { RecipientPersonModule } from './recipient-person/recipient-person.modul
 import { GroupModule } from './group/group.module';
 import { PersonGroupModule } from './person-group/person-group.module';
 import { MarketintAnalystModule } from './marketint-analyst/marketint-analyst.module';
+import { FinancialAdministratorModule } from './financial_administrator/financial_administrator.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { MarketintAnalystModule } from './marketint-analyst/marketint-analyst.mo
     GroupModule,
     PersonGroupModule,
     MarketintAnalystModule,
+    FinancialAdministratorModule,
   ],
   providers: [
     {
