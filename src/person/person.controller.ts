@@ -6,6 +6,8 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  Req,
 } from '@nestjs/common';
 import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
@@ -23,6 +25,18 @@ export class PersonController {
   @Post('sync')
   sync(@Body() createPersonDto: CreatePersonDto) {
     return this.personService.sync(createPersonDto);
+  }
+
+  @Get('search')
+  search(@Query('q') q: string, @Req() req: any) {
+    const token = req.headers.authorization?.replace('Bearer ', '') ?? '';
+    return this.personService.searchByNombre(q || '', token);
+  }
+
+  @Get('by-user-id/:userId')
+  findByUserId(@Param('userId') userId: string, @Req() req: any) {
+    const token = req.headers.authorization?.replace('Bearer ', '') ?? '';
+    return this.personService.findByUserId(userId, token);
   }
 
   @Get()

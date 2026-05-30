@@ -12,15 +12,21 @@ export class SecurityGuard implements CanActivate {
   private readonly logger = new Logger('SecurityGuard');
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Las conexiones WebSocket (eventos @SubscribeMessage) se autentican en handleConnection del gateway
+    if (context.getType() === 'ws') return true;
+
     const request = context.switchToHttp().getRequest();
     const { headers, method } = request;
+
+    // Peticiones HTTP de handshake de Socket.IO (polling/WebSocket upgrade)
+    const rawUrl = request.originalUrl || request.url || '';
+    if (rawUrl.startsWith('/socket.io')) return true;
 
     if (!headers.authorization) {
       throw new UnauthorizedException('Token de autorización faltante');
     }
 
     const token = headers.authorization.replace('Bearer ', '');
-    const rawUrl = request.originalUrl || request.url || '';
     const cleanUrl = rawUrl.split('?')[0];
 
     if (cleanUrl === '/person/sync' && method === 'POST') {
@@ -35,6 +41,23 @@ export class SecurityGuard implements CanActivate {
       this.logger.log(
         `Bypassing permission validation for personal update route -> URL: ${cleanUrl} Method: ${method}`,
       );
+      return true;
+    }
+
+    // Rutas de mensajería privada (validación JWT en el propio controlador)
+    if (
+      (cleanUrl === '/message/sent' || cleanUrl === '/message/received') &&
+      method === 'GET'
+    ) {
+      return true;
+    }
+    if (cleanUrl.match(/^\/message\/\d+\/read$/) && method === 'PATCH') {
+      return true;
+    }
+    if (cleanUrl === '/person/search' && method === 'GET') {
+      return true;
+    }
+    if (cleanUrl.match(/^\/person\/by-user-id\//) && method === 'GET') {
       return true;
     }
 

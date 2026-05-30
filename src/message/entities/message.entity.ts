@@ -6,7 +6,7 @@ export class Message {
     @PrimaryGeneratedColumn()
     id?: number;
 
-    @Column()
+    @Column({ length: 500 })
     contenido?: string;
 
     @Column()
@@ -15,6 +15,21 @@ export class Message {
     @Column()
     emisor?: string;
 
-    @ManyToOne(() => Person, (person) => person.messages)
+    @Column({ nullable: true })
+    receptor?: string;
+
+    @Column({ default: false })
+    leido?: boolean;
+
+    @Column({ nullable: true })
+    fechaLectura?: Date;
+
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    latitud?: number;
+
+    @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+    longitud?: number;
+
+    @ManyToOne(() => Person, (person) => person.messages, { nullable: true })
     person?: Person;
 }

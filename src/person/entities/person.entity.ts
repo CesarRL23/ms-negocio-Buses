@@ -13,7 +13,7 @@ export class Person {
   @Column({ nullable: true })
   userId?: string;
 
-  @OneToMany(() => Message, (message) => message.emisor)
+  @OneToMany(() => Message, (message) => message.person)
   messages?: Message[];
 
   @OneToMany(() => PersonGroup, (personGroup) => personGroup.person)

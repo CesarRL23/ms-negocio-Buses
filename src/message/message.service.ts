@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
@@ -38,5 +38,38 @@ export class MessageService {
   async remove(id: number): Promise<void> {
     const message = await this.findOne(id);
     await this.messageRepository.remove(message);
+  }
+
+  async saveMessage(dto: CreateMessageDto): Promise<Message> {
+    const message = this.messageRepository.create({
+      ...dto,
+      fechaDeEnvio: dto.fechaDeEnvio || (new Date() as any),
+      leido: false,
+    });
+    return await this.messageRepository.save(message);
+  }
+
+  async findSent(userId: string): Promise<Message[]> {
+    return await this.messageRepository.find({
+      where: { emisor: userId },
+      order: { fechaDeEnvio: 'DESC' },
+    });
+  }
+
+  async findReceived(userId: string): Promise<Message[]> {
+    return await this.messageRepository.find({
+      where: { receptor: userId },
+      order: { fechaDeEnvio: 'DESC' },
+    });
+  }
+
+  async markAsRead(id: number, callerUserId: string): Promise<Message> {
+    const message = await this.findOne(id);
+    if (message.receptor !== callerUserId) {
+      throw new ForbiddenException('Solo el destinatario puede marcar como leído');
+    }
+    message.leido = true;
+    message.fechaLectura = new Date();
+    return await this.messageRepository.save(message);
   }
 }

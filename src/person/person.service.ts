@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
+import axios from 'axios';
 import { Person } from './entities/person.entity';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
@@ -126,5 +127,29 @@ export class PersonService {
   async remove(id: number): Promise<void> {
     const person = await this.findOne(id);
     await this.personRepository.remove(person);
+  }
+
+  async searchByNombre(q: string, token: string): Promise<any[]> {
+    if (!q) return [];
+    const url = `${process.env.MS_SECURITY}/users/search?q=${encodeURIComponent(q)}`;
+    const { data } = await axios.get<{ id: string; name: string }[]>(url, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.map((u) => ({ id: 0, nombre: u.name, userId: u.id }));
+  }
+
+  async findByUserId(userId: string, token: string): Promise<{ nombre: string } | null> {
+    const local = await this.personRepository.findOne({ where: { userId } });
+    if (local?.nombre) return { nombre: local.nombre };
+
+    try {
+      const url = `${process.env.MS_SECURITY}/users/${userId}/name`;
+      const { data } = await axios.get<{ name?: string }>(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (data?.name) return { nombre: data.name };
+    } catch { /* MS_SECURITY no disponible o usuario no existe */ }
+
+    return null;
   }
 }
