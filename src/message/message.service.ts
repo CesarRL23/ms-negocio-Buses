@@ -13,7 +13,7 @@ export class MessageService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(PersonGroup)
     private readonly personGroupRepository: Repository<PersonGroup>,
-  ) {}
+  ) { }
 
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
     const message = this.messageRepository.create(createMessageDto);

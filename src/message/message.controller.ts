@@ -6,7 +6,7 @@ import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
 
   private extractUserId(req: any): string {
     const authHeader = req.headers.authorization;

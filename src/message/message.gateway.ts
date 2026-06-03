@@ -10,7 +10,7 @@ import {
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Server, Socket } from 'socket.io';
+import { Namespace, Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { MessageService } from './message.service';
@@ -24,7 +24,7 @@ import { PersonGroup } from '../person-group/entities/person-group.entity';
   namespace: '/messages',
 })
 export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() server: Namespace;
   private readonly logger = new Logger('MessageGateway');
   private connectedUsers = new Map<string, string>(); // userId -> socketId
 
@@ -165,15 +165,16 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
   // ── Notify user they were added to a group ──
   notifyGroupAdded(userId: string, payload: { groupId: number; groupName: string; addedBy: string }) {
     const groupRoom = `group-${payload.groupId}`;
-    const userSockets = this.server.sockets.adapter.rooms.get(userId);
+    const namespace = this.server;
+    const userSockets = namespace.adapter.rooms.get(userId);
     if (userSockets) {
       for (const socketId of userSockets) {
-        const socket = this.server.sockets.sockets.get(socketId);
+        const socket = namespace.sockets.get(socketId);
         socket?.join(groupRoom);
       }
     }
 
-    this.server.to(userId).emit('group_added', payload);
+    namespace.to(userId).emit('group_added', payload);
     this.logger.log(`Notified ${userId} about group "${payload.groupName}"`);
   }
 }
