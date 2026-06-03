@@ -17,6 +17,11 @@ export class GroupController {
     return this.groupService.findAll();
   }
 
+  @Get('user/:userId')
+  findByUserId(@Param('userId') userId: string) {
+    return this.groupService.findByUserId(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.groupService.findOne(+id);

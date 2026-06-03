@@ -12,6 +12,15 @@ export class Group {
   @Column({ nullable: true })
   description: string;
 
+  @Column({ default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: true })
+  imageUrl: string;
+
+  @Column({ nullable: true })
+  creatorUserId: string;
+
   @OneToMany(() => PersonGroup, (personGroup) => personGroup.group)
   personGroups: PersonGroup[];
 }

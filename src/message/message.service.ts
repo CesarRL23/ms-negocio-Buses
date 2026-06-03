@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './entities/message.entity';
+import { PersonGroup } from '../person-group/entities/person-group.entity';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
+    @InjectRepository(PersonGroup)
+    private readonly personGroupRepository: Repository<PersonGroup>,
   ) {}
 
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
@@ -41,12 +44,50 @@ export class MessageService {
   }
 
   async saveMessage(dto: CreateMessageDto): Promise<Message> {
+    if (dto.receptor?.startsWith('group-')) {
+      const groupId = Number(dto.receptor.replace('group-', ''));
+      if (Number.isNaN(groupId)) {
+        throw new ForbiddenException('Receptor de grupo inválido');
+      }
+
+      const membership = await this.personGroupRepository.findOne({
+        where: {
+          group: { id: groupId },
+          person: { userId: dto.emisor },
+        },
+        relations: ['group', 'person'],
+      });
+
+      if (!membership) {
+        throw new ForbiddenException('No estás autorizado para enviar mensajes a este grupo');
+      }
+    }
+
     const message = this.messageRepository.create({
       ...dto,
       fechaDeEnvio: dto.fechaDeEnvio || (new Date() as any),
       leido: false,
     });
     return await this.messageRepository.save(message);
+  }
+
+  async findGroupMessages(groupId: number, userId: string): Promise<Message[]> {
+    const membership = await this.personGroupRepository.findOne({
+      where: {
+        group: { id: groupId },
+        person: { userId },
+      },
+      relations: ['group', 'person'],
+    });
+
+    if (!membership) {
+      throw new ForbiddenException('No perteneces a este grupo');
+    }
+
+    return await this.messageRepository.find({
+      where: { receptor: `group-${groupId}` },
+      order: { fechaDeEnvio: 'ASC' },
+    });
   }
 
   async findSent(userId: string): Promise<Message[]> {

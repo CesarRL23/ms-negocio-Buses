@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Person } from '../../person/entities/person.entity';
 import { Group } from '../../group/entities/group.entity';
 
@@ -6,6 +6,9 @@ import { Group } from '../../group/entities/group.entity';
 export class PersonGroup {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ default: 'member' })
+  role: string; // 'admin' | 'member'
 
   @ManyToOne(() => Person, (person) => person.personGroups)
   @JoinColumn({ name: 'person_id' })

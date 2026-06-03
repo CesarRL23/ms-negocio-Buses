@@ -8,10 +8,13 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Server, Socket } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { MessageService } from './message.service';
+import { PersonGroup } from '../person-group/entities/person-group.entity';
 
 @WebSocketGateway({
   cors: {
@@ -25,9 +28,25 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
   private readonly logger = new Logger('MessageGateway');
   private connectedUsers = new Map<string, string>(); // userId -> socketId
 
-  constructor(private readonly messageService: MessageService) {}
+  constructor(
+    private readonly messageService: MessageService,
+    @InjectRepository(PersonGroup)
+    private readonly personGroupRepository: Repository<PersonGroup>,
+  ) {}
 
-  handleConnection(client: Socket) {
+  private async joinUserGroupRooms(client: Socket, userId: string) {
+    const memberships = await this.personGroupRepository.find({
+      where: { person: { userId } },
+      relations: ['group'],
+    });
+
+    for (const membership of memberships) {
+      const groupRoom = `group-${membership.group.id}`;
+      client.join(groupRoom);
+    }
+  }
+
+  async handleConnection(client: Socket) {
     try {
       const token = client.handshake.auth?.token as string;
       if (!token) {
@@ -49,6 +68,7 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
 
       client.data.userId = userId;
       client.join(userId);
+      await this.joinUserGroupRooms(client, userId);
       this.connectedUsers.set(userId, client.id);
     } catch {
       this.logger.warn(`Invalid token for client ${client.id}, disconnecting`);
@@ -140,5 +160,20 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
     } catch {
       client.emit('message_error', { error: 'No se pudo marcar como leído' });
     }
+  }
+
+  // ── Notify user they were added to a group ──
+  notifyGroupAdded(userId: string, payload: { groupId: number; groupName: string; addedBy: string }) {
+    const groupRoom = `group-${payload.groupId}`;
+    const userSockets = this.server.sockets.adapter.rooms.get(userId);
+    if (userSockets) {
+      for (const socketId of userSockets) {
+        const socket = this.server.sockets.sockets.get(socketId);
+        socket?.join(groupRoom);
+      }
+    }
+
+    this.server.to(userId).emit('group_added', payload);
+    this.logger.log(`Notified ${userId} about group "${payload.groupName}"`);
   }
 }

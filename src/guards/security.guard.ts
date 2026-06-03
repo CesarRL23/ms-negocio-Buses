@@ -46,7 +46,7 @@ export class SecurityGuard implements CanActivate {
 
     // Rutas de mensajería privada (validación JWT en el propio controlador)
     if (
-      (cleanUrl === '/message/sent' || cleanUrl === '/message/received') &&
+      (cleanUrl === '/message/sent' || cleanUrl === '/message/received' || cleanUrl.match(/^\/message\/group\/\d+$/)) &&
       method === 'GET'
     ) {
       return true;

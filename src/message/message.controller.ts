@@ -36,6 +36,12 @@ export class MessageController {
     return this.messageService.findReceived(userId);
   }
 
+  @Get('group/:groupId')
+  findGroupMessages(@Param('groupId') groupId: string, @Req() req: any) {
+    const userId = this.extractUserId(req);
+    return this.messageService.findGroupMessages(+groupId, userId);
+  }
+
   @Get()
   findAll() {
     return this.messageService.findAll();
