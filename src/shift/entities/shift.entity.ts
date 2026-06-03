@@ -35,11 +35,10 @@ export class Shift {
 
   @Column({ nullable: true })
   hora_inicio_real?: Date;
-
+  
   @Column({ nullable: true })
   hora_fin_real?: Date;
 
-  // 🔥 RELACIONES CORRECTAS
 
   @ManyToOne(() => Driver, (driver) => driver.shifts)
   @JoinColumn({ name: 'driver_id' })
