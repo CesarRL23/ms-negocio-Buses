@@ -31,6 +31,7 @@ import { PersonGroupModule } from './person-group/person-group.module';
 import { MarketintAnalystModule } from './marketint-analyst/marketint-analyst.module';
 import { FinancialAdministratorModule } from './financial_administrator/financial_administrator.module';
 import { OperationsManagerModule } from './operations_manager/operations_manager.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { OperationsManagerModule } from './operations_manager/operations_manager
     MarketintAnalystModule,
     FinancialAdministratorModule,
     OperationsManagerModule,
+    AppointmentModule,
   ],
   providers: [
     {

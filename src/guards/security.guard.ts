@@ -61,6 +61,28 @@ export class SecurityGuard implements CanActivate {
       return true;
     }
 
+    // ── Rutas de citas (appointment) ──────────────────────────────
+    // GET /appointment/availability → pública (sin token)
+    if (cleanUrl === '/appointment/availability' && method === 'GET') {
+      return true;
+    }
+    // GET /appointment/user/:userId → ciudadano consulta sus propias citas
+    if (cleanUrl.match(/^\/appointment\/user\//) && method === 'GET') {
+      return true;
+    }
+    // POST /appointment → ciudadano agenda una cita
+    if (cleanUrl === '/appointment' && method === 'POST') {
+      return true;
+    }
+    // DELETE /appointment/:id → ciudadano cancela su cita
+    if (cleanUrl.match(/^\/appointment\/\d+$/) && method === 'DELETE') {
+      return true;
+    }
+    // GET /appointment → admin lista todas las citas
+    if (cleanUrl === '/appointment' && method === 'GET') {
+      return true;
+    }
+
     const publicReadRoutes = [
       '/whereabouts',
       '/route',
