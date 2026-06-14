@@ -22,12 +22,20 @@ export class SecurityGuard implements CanActivate {
     const rawUrl = request.originalUrl || request.url || '';
     if (rawUrl.startsWith('/socket.io')) return true;
 
+    const cleanUrl = rawUrl.split('?')[0];
+
+    // ── Rutas de alertas de clima (llamadas desde n8n, sin token) ──
+    if (cleanUrl === '/weather-alert' && method === 'POST') return true;
+    if (cleanUrl.match(/^\/weather-alert\/user\//) && method === 'GET') return true;
+    if (cleanUrl.match(/^\/weather-alert\/user\//) && method === 'DELETE') return true;
+    if (cleanUrl.match(/^\/weather-alert\/\d+$/) && method === 'PATCH') return true;
+    if (cleanUrl === '/weather-alert/subscribers' && method === 'GET') return true;
+
     if (!headers.authorization) {
       throw new UnauthorizedException('Token de autorización faltante');
     }
 
     const token = headers.authorization.replace('Bearer ', '');
-    const cleanUrl = rawUrl.split('?')[0];
 
     if (cleanUrl === '/person/sync' && method === 'POST') {
       this.logger.log(
@@ -82,6 +90,13 @@ export class SecurityGuard implements CanActivate {
     if (cleanUrl === '/appointment' && method === 'GET') {
       return true;
     }
+
+    // ── Rutas de alertas de clima (weather-alert) ──────────────────
+    if (cleanUrl === '/weather-alert' && method === 'POST') return true;
+    if (cleanUrl.match(/^\/weather-alert\/user\//) && method === 'GET') return true;
+    if (cleanUrl.match(/^\/weather-alert\/user\//) && method === 'DELETE') return true;
+    if (cleanUrl.match(/^\/weather-alert\/\d+$/) && method === 'PATCH') return true;
+    if (cleanUrl === '/weather-alert/subscribers' && method === 'GET') return true;
 
     const publicReadRoutes = [
       '/whereabouts',

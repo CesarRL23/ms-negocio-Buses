@@ -29,20 +29,66 @@ export class AppointmentService {
   // ─────────────────────────────────────────────────────────────────
 
   async getAvailability() {
-    const slots = await this.googleCalendar.getAvailableSlots(10);
+    // 1. Obtener slots desde n8n (FreeBusy de Google Calendar)
+    const { slots, grouped } = await this.googleCalendar.getAvailableSlots();
 
-    // Agrupar por fecha para facilitar el renderizado del calendario
-    const grouped: Record<string, { time: string; dateTimeStart: string; dateTimeEnd: string }[]> = {};
-    for (const slot of slots) {
-      if (!grouped[slot.date]) grouped[slot.date] = [];
-      grouped[slot.date].push({
-        time: slot.time,
-        dateTimeStart: slot.dateTimeStart,
-        dateTimeEnd: slot.dateTimeEnd,
+    // 2. Obtener citas confirmadas en nuestra BD para excluirlas también
+    const confirmed = await this.repo.find({
+      where: { estado: AppointmentStatus.CONFIRMED },
+      select: ['fecha', 'hora'],
+    });
+
+    // Construir set de claves "YYYY-MM-DD|HH:MM" para búsqueda O(1)
+    // MySQL puede devolver fecha como Date y hora como "09:00:00" — normalizamos ambos
+    const bookedKeys = new Set(
+      confirmed.map((a) => {
+        const fecha = String(a.fecha).slice(0, 10);
+        const hora = String(a.hora).slice(0, 5);
+        return `${fecha}|${hora}`;
+      }),
+    );
+
+    // 3. Filtrar slots ya reservados en BD
+    const filteredSlots = slots.filter(
+      (s: any) => !bookedKeys.has(`${s.date}|${s.time}`),
+    );
+
+    const filteredGrouped: Record<string, any[]> = {};
+    for (const s of filteredSlots) {
+      if (!filteredGrouped[s.date]) filteredGrouped[s.date] = [];
+      filteredGrouped[s.date].push({
+        time: s.time,
+        dateTimeStart: s.dateTimeStart,
+        dateTimeEnd: s.dateTimeEnd,
       });
     }
 
-    return { slots, grouped };
+    return { slots: filteredSlots, grouped: filteredGrouped };
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  //  MARCAR CITAS PASADAS COMO COMPLETADAS
+  // ─────────────────────────────────────────────────────────────────
+
+  private async markPastAppointmentsAsCompleted() {
+    const now = new Date();
+    // Fecha y hora actuales en Colombia (UTC-5)
+    const padZ = (n: number) => String(n).padStart(2, '0');
+    const todayCol = `${now.getUTCFullYear()}-${padZ(now.getUTCMonth() + 1)}-${padZ(now.getUTCDate())}`;
+    const hourCol = now.getUTCHours() - 5; // ajuste UTC-5
+
+    const confirmed = await this.repo.find({
+      where: { estado: AppointmentStatus.CONFIRMED },
+    });
+
+    for (const appt of confirmed) {
+      const apptDateTime = new Date(`${appt.fecha}T${appt.hora}:00-05:00`);
+      // Si la cita ya terminó (pasaron 30 min desde su inicio)
+      if (now.getTime() > apptDateTime.getTime() + 30 * 60_000) {
+        appt.estado = AppointmentStatus.COMPLETED;
+        await this.repo.save(appt);
+      }
+    }
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -88,17 +134,16 @@ export class AppointmentService {
     try {
       const result = await this.googleCalendar.createEvent({
         summary: `Cita ${dto.tipoAtencion === AttentionType.VIRTUAL ? 'Virtual' : 'Presencial'} — ${tipoConsultaLabel[dto.tipoConsulta] ?? dto.tipoConsulta}`,
-        description: [
-          `Cliente: ${dto.citizenName} (${dto.citizenEmail})`,
-          `Tipo de atención: ${dto.tipoAtencion}`,
-          `Consulta: ${tipoConsultaLabel[dto.tipoConsulta] ?? dto.tipoConsulta}`,
-          `Motivo: ${dto.motivo}`,
-        ].join('\n'),
+        description: `Cliente: ${dto.citizenName} (${dto.citizenEmail})\nConsulta: ${tipoConsultaLabel[dto.tipoConsulta] ?? dto.tipoConsulta}\nMotivo: ${dto.motivo}`,
         dateTimeStart: dateTimeStart.toISOString(),
         dateTimeEnd: dateTimeEnd.toISOString(),
         attendeeEmail: dto.citizenEmail,
         asesorEmail,
         tipoAtencion: dto.tipoAtencion,
+        citizenName: dto.citizenName,
+        citizenEmail: dto.citizenEmail,
+        tipoConsulta: dto.tipoConsulta,
+        motivo: dto.motivo,
         location:
           dto.tipoAtencion === AttentionType.PRESENCIAL
             ? this.config.get<string>('OFFICE_ADDRESS') || 'Calle 65 # 26-10'
@@ -107,12 +152,8 @@ export class AppointmentService {
       eventId = result.eventId;
       meetLink = result.meetLink;
     } catch (err: any) {
-      this.logger.error('═══ ERROR Google Calendar ═══');
-      this.logger.error('Mensaje: ' + err.message);
-      this.logger.error('Código:  ' + (err?.code ?? err?.response?.status ?? 'N/A'));
-      this.logger.error('Detalle: ' + JSON.stringify(err?.response?.data ?? err?.errors ?? {}));
+      this.logger.error('Error n8n Google Calendar: ' + err.message);
       this.logger.warn('La cita se guardará en BD sin evento de calendario.');
-      // No bloqueamos la reserva si Calendar falla
     }
 
     // Guardar en base de datos
@@ -178,6 +219,7 @@ export class AppointmentService {
   // ─────────────────────────────────────────────────────────────────
 
   async findByUser(citizenUserId: string): Promise<Appointment[]> {
+    await this.markPastAppointmentsAsCompleted();
     return this.repo.find({
       where: { citizenUserId },
       order: { fecha: 'DESC', hora: 'DESC' },
@@ -185,6 +227,7 @@ export class AppointmentService {
   }
 
   async findAll(): Promise<Appointment[]> {
+    await this.markPastAppointmentsAsCompleted();
     return this.repo.find({ order: { fecha: 'DESC', hora: 'DESC' } });
   }
 

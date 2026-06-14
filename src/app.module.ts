@@ -32,6 +32,7 @@ import { MarketintAnalystModule } from './marketint-analyst/marketint-analyst.mo
 import { FinancialAdministratorModule } from './financial_administrator/financial_administrator.module';
 import { OperationsManagerModule } from './operations_manager/operations_manager.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { WeatherAlertModule } from './weather-alert/weather-alert.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { AppointmentModule } from './appointment/appointment.module';
     FinancialAdministratorModule,
     OperationsManagerModule,
     AppointmentModule,
+    WeatherAlertModule,
   ],
   providers: [
     {
