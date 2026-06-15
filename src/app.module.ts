@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { PersonModule } from './person/person.module';
 import { CitizenModule } from './citizen/citizen.module';
@@ -34,12 +35,15 @@ import { OperationsManagerModule } from './operations_manager/operations_manager
 import { AppointmentModule } from './appointment/appointment.module';
 import { WeatherAlertModule } from './weather-alert/weather-alert.module';
 import { PqrsModule } from './pqrs/pqrs.module';
+import { AnnouncementModule } from './announcement/announcement.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+
+    ScheduleModule.forRoot(),
 
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -103,6 +107,7 @@ import { PqrsModule } from './pqrs/pqrs.module';
     AppointmentModule,
     WeatherAlertModule,
     PqrsModule,
+    AnnouncementModule,
   ],
   providers: [
     {

@@ -30,6 +30,15 @@ export class Message {
     @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
     longitud?: number;
 
+    @Column({ type: 'enum', enum: ['CHAT', 'ANNOUNCEMENT'], default: 'CHAT' })
+    messageType?: 'CHAT' | 'ANNOUNCEMENT';
+
+    @Column({ nullable: true })
+    announcementId?: number;
+
+    @Column({ default: false })
+    isUrgent?: boolean;
+
     @ManyToOne(() => Person, (person) => person.messages, { nullable: true })
     person?: Person;
 }

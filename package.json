@@ -26,6 +26,7 @@
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/platform-socket.io": "^11.1.26",
+    "@nestjs/schedule": "^5.0.1",
     "@nestjs/typeorm": "^11.0.1",
     "@nestjs/websockets": "^11.1.26",
     "axios": "^1.15.2",

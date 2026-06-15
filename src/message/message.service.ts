@@ -5,6 +5,9 @@ import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Message } from './entities/message.entity';
 import { PersonGroup } from '../person-group/entities/person-group.entity';
+import { AnnouncementRecipient } from '../announcement/entities/announcement-recipient.entity';
+import { Announcement } from '../announcement/entities/announcement.entity';
+import { SYSTEM_ANNOUNCEMENTS_SENDER_ID } from '../announcement/constants';
 
 @Injectable()
 export class MessageService {
@@ -13,6 +16,8 @@ export class MessageService {
     private readonly messageRepository: Repository<Message>,
     @InjectRepository(PersonGroup)
     private readonly personGroupRepository: Repository<PersonGroup>,
+    @InjectRepository(AnnouncementRecipient)
+    private readonly recipientRepository: Repository<AnnouncementRecipient>,
   ) { }
 
   async create(createMessageDto: CreateMessageDto): Promise<Message> {
@@ -111,6 +116,31 @@ export class MessageService {
     }
     message.leido = true;
     message.fechaLectura = new Date();
-    return await this.messageRepository.save(message);
+    const saved = await this.messageRepository.save(message);
+
+    if (saved.messageType === 'ANNOUNCEMENT' && saved.announcementId) {
+      await this.recipientRepository.update(
+        { announcement: { id: saved.announcementId }, userId: callerUserId },
+        { read: true, readAt: new Date() },
+      );
+    }
+
+    return saved;
+  }
+
+  async createAnnouncementMessages(announcement: Announcement, userIds: string[]): Promise<Message[]> {
+    const messages = userIds.map((userId) =>
+      this.messageRepository.create({
+        emisor: SYSTEM_ANNOUNCEMENTS_SENDER_ID,
+        receptor: userId,
+        contenido: announcement.message,
+        fechaDeEnvio: new Date(),
+        leido: false,
+        messageType: 'ANNOUNCEMENT',
+        announcementId: announcement.id,
+        isUrgent: !!announcement.isUrgent,
+      }),
+    );
+    return this.messageRepository.save(messages);
   }
 }

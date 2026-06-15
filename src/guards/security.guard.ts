@@ -70,6 +70,14 @@ export class SecurityGuard implements CanActivate {
     if (cleanUrl.match(/^\/message\/\d+\/read$/) && method === 'PATCH') {
       return true;
     }
+
+    // ── Avisos masivos: rutas de autoservicio del ciudadano ──
+    if (cleanUrl === '/announcements/mine' && method === 'GET') {
+      return true;
+    }
+    if (cleanUrl.match(/^\/announcements\/\d+\/read$/) && method === 'POST') {
+      return true;
+    }
     if (cleanUrl === '/person/search' && method === 'GET') {
       return true;
     }

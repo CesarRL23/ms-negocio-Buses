@@ -15,6 +15,8 @@ import * as jwt from 'jsonwebtoken';
 import * as crypto from 'crypto';
 import { MessageService } from './message.service';
 import { PersonGroup } from '../person-group/entities/person-group.entity';
+import { Message } from './entities/message.entity';
+import { SYSTEM_ANNOUNCEMENTS_SENDER_ID } from '../announcement/constants';
 
 @WebSocketGateway({
   cors: {
@@ -109,6 +111,11 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
       return;
     }
 
+    if (body.receptor === SYSTEM_ANNOUNCEMENTS_SENDER_ID) {
+      client.emit('message_error', { error: 'No se puede responder a este canal' });
+      return;
+    }
+
     try {
       const saved = await this.messageService.saveMessage({
         emisor,
@@ -159,6 +166,35 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
       });
     } catch {
       client.emit('message_error', { error: 'No se pudo marcar como leído' });
+    }
+  }
+
+  // ── Returns which of the given userIds currently have an open socket ──
+  getConnectedUserIds(userIds: string[]): string[] {
+    return userIds.filter((userId) => this.connectedUsers.has(userId));
+  }
+
+  // ── Broadcast a mass announcement to a set of users ──
+  broadcastAnnouncement(
+    userIds: string[],
+    payload: { id: number; title: string; message: string; isUrgent: boolean; createdAt: Date },
+    isUrgent: boolean,
+  ) {
+    if (userIds.length === 0) return;
+
+    this.server.to(userIds).emit('announcement', payload);
+    if (isUrgent) {
+      this.server.to(userIds).emit('urgent_announcement', payload);
+    }
+    this.logger.log(`Broadcast announcement #${payload.id} to ${userIds.length} usuario(s)`);
+  }
+
+  // ── Deliver newly created announcement-messages to connected recipients ──
+  broadcastNewMessages(messages: Message[]) {
+    for (const msg of messages) {
+      if (msg.receptor) {
+        this.server.to(msg.receptor).emit('new_message', msg);
+      }
     }
   }
 
