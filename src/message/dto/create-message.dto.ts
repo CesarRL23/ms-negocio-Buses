@@ -1,5 +1,5 @@
 
-import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Max, Min } from 'class-validator';
+import { IsDateString, IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Max, Min } from 'class-validator';
 
 export class CreateMessageDto {
   @IsNotEmpty()
@@ -30,4 +30,8 @@ export class CreateMessageDto {
   @Min(-180)
   @Max(180)
   longitud?: number;
+
+  @IsOptional()
+  @IsIn(['citizen', 'driver'])
+  senderInterface?: 'citizen' | 'driver';
 }

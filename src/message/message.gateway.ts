@@ -88,7 +88,7 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
   @SubscribeMessage('send_message')
   async handleSendMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() body: { receptor: string; contenido: string; latitud?: number; longitud?: number },
+    @MessageBody() body: { receptor: string; contenido: string; latitud?: number; longitud?: number; senderInterface?: 'citizen' | 'driver' },
   ) {
     const emisor = client.data?.userId as string;
     if (!emisor) {
@@ -124,6 +124,7 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
         fechaDeEnvio: new Date() as any,
         latitud: body.latitud,
         longitud: body.longitud,
+        senderInterface: body.senderInterface,
       });
 
       // Entrega al receptor en tiempo real
@@ -169,6 +170,33 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
     }
   }
 
+  @SubscribeMessage('mark_group_read')
+  async handleMarkGroupRead(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() body: { messageId: number },
+  ) {
+    const callerUserId = client.data?.userId as string;
+    if (!callerUserId) {
+      client.emit('message_error', { error: 'No autenticado' });
+      return;
+    }
+
+    try {
+      const read = await this.messageService.markGroupMessageRead(body.messageId, callerUserId);
+
+      // Notifica a todo el grupo que este usuario leyó el mensaje
+      if (read.message?.receptor) {
+        this.server.to(read.message.receptor).emit('group_message_read', {
+          messageId: read.message.id,
+          userId: read.userId,
+          readAt: read.readAt,
+        });
+      }
+    } catch {
+      client.emit('message_error', { error: 'No se pudo marcar como leído' });
+    }
+  }
+
   // ── Returns which of the given userIds currently have an open socket ──
   getConnectedUserIds(userIds: string[]): string[] {
     return userIds.filter((userId) => this.connectedUsers.has(userId));
@@ -196,6 +224,11 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
         this.server.to(msg.receptor).emit('new_message', msg);
       }
     }
+  }
+
+  // ── Notify a group room that a message was deleted by an admin ──
+  broadcastMessageDeleted(receptor: string, messageId: number) {
+    this.server.to(receptor).emit('message_deleted', { messageId });
   }
 
   // ── Notify user they were added to a group ──

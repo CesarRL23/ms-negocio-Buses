@@ -1,12 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { MessageService } from './message.service';
+import { MessageGateway } from './message.gateway';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 
 @Controller('message')
 export class MessageController {
-  constructor(private readonly messageService: MessageService) { }
+  constructor(
+    private readonly messageService: MessageService,
+    private readonly messageGateway: MessageGateway,
+  ) { }
 
   private extractUserId(req: any): string {
     const authHeader = req.headers.authorization;
@@ -40,6 +44,22 @@ export class MessageController {
   findGroupMessages(@Param('groupId') groupId: string, @Req() req: any) {
     const userId = this.extractUserId(req);
     return this.messageService.findGroupMessages(+groupId, userId);
+  }
+
+  @Get('group/:groupId/:messageId/reads')
+  getGroupMessageReads(@Param('messageId') messageId: string, @Req() req: any) {
+    const userId = this.extractUserId(req);
+    return this.messageService.getGroupMessageReadStatus(+messageId, userId);
+  }
+
+  @Delete('group/:messageId')
+  async removeGroupMessage(@Param('messageId') messageId: string, @Req() req: any) {
+    const userId = this.extractUserId(req);
+    const updated = await this.messageService.removeGroupMessage(+messageId, userId);
+    if (updated.receptor) {
+      this.messageGateway.broadcastMessageDeleted(updated.receptor, updated.id as number);
+    }
+    return updated;
   }
 
   @Get()

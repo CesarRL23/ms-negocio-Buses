@@ -70,6 +70,12 @@ export class SecurityGuard implements CanActivate {
     if (cleanUrl.match(/^\/message\/\d+\/read$/) && method === 'PATCH') {
       return true;
     }
+    if (cleanUrl.match(/^\/message\/group\/\d+\/\d+\/reads$/) && method === 'GET') {
+      return true;
+    }
+    if (cleanUrl.match(/^\/message\/group\/\d+$/) && method === 'DELETE') {
+      return true;
+    }
 
     // ── Avisos masivos: rutas de autoservicio del ciudadano ──
     if (cleanUrl === '/announcements/mine' && method === 'GET') {
@@ -121,6 +127,7 @@ export class SecurityGuard implements CanActivate {
       '/programming',
       '/ticket',
       '/company-admin',
+      '/shift',
     ];
     const isPublicReadRoute =
       method === 'GET' &&

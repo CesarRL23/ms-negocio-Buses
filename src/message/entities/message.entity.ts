@@ -39,6 +39,15 @@ export class Message {
     @Column({ default: false })
     isUrgent?: boolean;
 
+    @Column({ type: 'enum', enum: ['citizen', 'driver'], default: 'citizen' })
+    senderRole?: 'citizen' | 'driver';
+
+    @Column({ nullable: true })
+    deletedAt?: Date;
+
+    @Column({ nullable: true })
+    deletedBy?: string;
+
     @ManyToOne(() => Person, (person) => person.messages, { nullable: true })
     person?: Person;
 }
