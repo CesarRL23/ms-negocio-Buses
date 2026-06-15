@@ -24,6 +24,14 @@ export class SecurityGuard implements CanActivate {
 
     const cleanUrl = rawUrl.split('?')[0];
 
+    // ── PQRS: creación pública, consulta por radicado, rutas de agente/n8n ──
+    if (cleanUrl === '/pqrs' && method === 'POST') return true;
+    if (cleanUrl.match(/^\/pqrs\/radicado\//) && method === 'GET') return true;
+    if (cleanUrl.match(/^\/pqrs\/user\//) && method === 'GET') return true;
+    if (cleanUrl === '/pqrs/overdue' && method === 'GET') return true;
+    if (cleanUrl === '/pqrs' && method === 'GET') return true;
+    if (cleanUrl.match(/^\/pqrs\/\d+\/status$/) && method === 'PATCH') return true;
+
     // ── Rutas de alertas de clima (llamadas desde n8n, sin token) ──
     if (cleanUrl === '/weather-alert' && method === 'POST') return true;
     if (cleanUrl.match(/^\/weather-alert\/user\//) && method === 'GET') return true;

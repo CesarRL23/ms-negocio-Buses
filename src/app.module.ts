@@ -33,6 +33,7 @@ import { FinancialAdministratorModule } from './financial_administrator/financia
 import { OperationsManagerModule } from './operations_manager/operations_manager.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { WeatherAlertModule } from './weather-alert/weather-alert.module';
+import { PqrsModule } from './pqrs/pqrs.module';
 
 @Module({
   imports: [
@@ -101,6 +102,7 @@ import { WeatherAlertModule } from './weather-alert/weather-alert.module';
     OperationsManagerModule,
     AppointmentModule,
     WeatherAlertModule,
+    PqrsModule,
   ],
   providers: [
     {
