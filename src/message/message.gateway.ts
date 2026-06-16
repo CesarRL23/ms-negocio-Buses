@@ -231,6 +231,52 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
     this.server.to(receptor).emit('message_deleted', { messageId });
   }
 
+  // ── Notify all members that a member was removed/banned ──
+  notifyMemberRemoved(groupId: number, removedUserId: string, removedByName: string) {
+    const payload = { groupId, removedUserId, removedByName };
+
+    // Notify the removed user personally
+    this.server.to(removedUserId).emit('group_member_removed', payload);
+
+    // Notify remaining group members
+    this.server.to(`group-${groupId}`).emit('group_member_removed', payload);
+
+    // Remove the user's socket from the group room if they are connected
+    const socketId = this.connectedUsers.get(removedUserId);
+    if (socketId) {
+      const socket = this.server.sockets.get(socketId);
+      socket?.leave(`group-${groupId}`);
+    }
+
+    this.logger.log(`Member ${removedUserId} removed from group-${groupId} by ${removedByName}`);
+  }
+
+  // ── Notify all members that a member was promoted to admin ──
+  notifyMemberPromoted(
+    groupId: number,
+    promotedUserId: string,
+    promotedName: string,
+    promotedByName: string,
+  ) {
+    this.server.to(`group-${groupId}`).emit('group_member_promoted', {
+      groupId,
+      promotedUserId,
+      promotedName,
+      promotedByName,
+    });
+    this.logger.log(`Member ${promotedUserId} promoted to admin in group-${groupId}`);
+  }
+
+  // ── Notify all members that the group was renamed ──
+  notifyGroupNameChanged(groupId: number, newName: string, changedByName: string) {
+    this.server.to(`group-${groupId}`).emit('group_name_changed', {
+      groupId,
+      newName,
+      changedByName,
+    });
+    this.logger.log(`Group-${groupId} renamed to "${newName}" by ${changedByName}`);
+  }
+
   // ── Notify user they were added to a group ──
   notifyGroupAdded(userId: string, payload: { groupId: number; groupName: string; addedBy: string }) {
     const groupRoom = `group-${payload.groupId}`;

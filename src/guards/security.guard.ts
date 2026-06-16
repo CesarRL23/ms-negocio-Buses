@@ -67,6 +67,16 @@ export class SecurityGuard implements CanActivate {
     ) {
       return true;
     }
+
+    // Rutas de gestión de miembros del grupo (auth por JWT en el propio controlador)
+    if (cleanUrl.match(/^\/group\/\d+\/members$/) && ['GET', 'POST'].includes(method)) return true;
+    if (cleanUrl.match(/^\/group\/\d+\/members\/[^/]+$/) && method === 'DELETE') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/members\/[^/]+\/promote$/) && method === 'PATCH') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/bans$/) && method === 'POST') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/log$/) && method === 'GET') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/rename$/) && method === 'PATCH') return true;
+    if (cleanUrl === '/group/public' && method === 'GET') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/join$/) && method === 'POST') return true;
     if (cleanUrl.match(/^\/message\/\d+\/read$/) && method === 'PATCH') {
       return true;
     }
