@@ -14,6 +14,7 @@ import { Person } from '../person/entities/person.entity';
 import { GroupMembershipLog } from './entities/group-membership-log.entity';
 import { GroupBan } from './entities/group-ban.entity';
 import { MessageGateway } from '../message/message.gateway';
+import { Message } from '../message/entities/message.entity';
 
 @Injectable()
 export class GroupService {
@@ -29,6 +30,8 @@ export class GroupService {
     @InjectRepository(GroupBan)
     private readonly banRepository: Repository<GroupBan>,
     private readonly messageGateway: MessageGateway,
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
   ) {}
 
   private async assertAdmin(groupId: number, callerUserId: string): Promise<PersonGroup> {
@@ -430,6 +433,62 @@ export class GroupService {
     });
 
     return { success: true, groupId, groupName: group.name };
+  }
+
+  async leaveGroup(groupId: number, callerUserId: string): Promise<{ groupDeleted: boolean }> {
+    const callerMembership = await this.personGroupRepository.findOne({
+      where: { group: { id: groupId }, person: { userId: callerUserId } },
+      relations: ['person'],
+    });
+    if (!callerMembership) {
+      throw new ForbiddenException('No eres miembro de este grupo');
+    }
+
+    const allMemberships = await this.personGroupRepository.find({
+      where: { group: { id: groupId } },
+      relations: ['person'],
+    });
+
+    if (allMemberships.length === 1) {
+      await this.personGroupRepository.remove(callerMembership);
+      await this.messageRepository.delete({ receptor: `group-${groupId}` });
+      await this.banRepository.delete({ groupId });
+      await this.logRepository.delete({ groupId });
+      await this.groupRepository.delete(groupId);
+      return { groupDeleted: true };
+    }
+
+    if (callerMembership.role === 'admin') {
+      const otherAdmins = allMemberships.filter(
+        (m) => m.role === 'admin' && m.person.userId !== callerUserId,
+      );
+      if (otherAdmins.length === 0) {
+        throw new BadRequestException(
+          'Debes asignar un administrador antes de abandonar el grupo',
+        );
+      }
+    }
+
+    const callerPerson = callerMembership.person;
+    const group = await this.groupRepository.findOne({ where: { id: groupId } });
+
+    await this.personGroupRepository.remove(callerMembership);
+    await this.recordLog(groupId, 'left', callerPerson, callerPerson);
+
+    const remainingAdminIds = allMemberships
+      .filter((m) => m.role === 'admin' && m.person.userId !== callerUserId)
+      .map((m) => m.person.userId)
+      .filter((id): id is string => !!id);
+
+    this.messageGateway.notifyMemberLeft(
+      groupId,
+      group?.name ?? '',
+      callerUserId,
+      callerPerson.nombre ?? '',
+      remainingAdminIds,
+    );
+
+    return { groupDeleted: false };
   }
 
   async renameGroup(groupId: number, newName: string, callerUserId: string) {

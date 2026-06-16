@@ -251,6 +251,38 @@ export class MessageGateway implements OnGatewayConnection, OnGatewayDisconnect 
     this.logger.log(`Member ${removedUserId} removed from group-${groupId} by ${removedByName}`);
   }
 
+  // ── Notify all members that a member voluntarily left ──
+  notifyMemberLeft(
+    groupId: number,
+    groupName: string,
+    leftUserId: string,
+    leftUserName: string,
+    remainingAdminIds: string[],
+  ) {
+    const payload = { groupId, leftUserId, leftUserName };
+
+    // Evict first so the departing user does NOT receive the broadcast
+    const socketId = this.connectedUsers.get(leftUserId);
+    if (socketId) {
+      const socket = this.server.sockets.get(socketId);
+      socket?.leave(`group-${groupId}`);
+    }
+
+    // Broadcast to remaining members (departing user already evicted)
+    this.server.to(`group-${groupId}`).emit('group_member_left', payload);
+
+    // Bell notification exclusively for remaining admins
+    for (const adminId of remainingAdminIds) {
+      this.server.to(adminId).emit('group_member_left_notify', {
+        groupId,
+        groupName,
+        leftUserName,
+      });
+    }
+
+    this.logger.log(`Member ${leftUserId} (${leftUserName}) voluntarily left group-${groupId}`);
+  }
+
   // ── Notify all members that a member was promoted to admin ──
   notifyMemberPromoted(
     groupId: number,

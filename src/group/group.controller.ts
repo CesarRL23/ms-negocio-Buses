@@ -97,6 +97,15 @@ export class GroupController {
     return this.groupService.selfJoin(+id, callerUserId);
   }
 
+  @Post(':id/leave')
+  leaveGroup(
+    @Param('id') id: string,
+    @Headers('authorization') auth: string,
+  ) {
+    const callerUserId = extractUserIdFromAuthHeader(auth);
+    return this.groupService.leaveGroup(+id, callerUserId);
+  }
+
   @Patch(':id/rename')
   renameGroup(
     @Param('id') id: string,

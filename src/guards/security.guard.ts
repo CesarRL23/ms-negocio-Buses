@@ -77,6 +77,7 @@ export class SecurityGuard implements CanActivate {
     if (cleanUrl.match(/^\/group\/\d+\/rename$/) && method === 'PATCH') return true;
     if (cleanUrl === '/group/public' && method === 'GET') return true;
     if (cleanUrl.match(/^\/group\/\d+\/join$/) && method === 'POST') return true;
+    if (cleanUrl.match(/^\/group\/\d+\/leave$/) && method === 'POST') return true;
     if (cleanUrl.match(/^\/message\/\d+\/read$/) && method === 'PATCH') {
       return true;
     }
